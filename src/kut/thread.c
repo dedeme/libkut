@@ -5,6 +5,7 @@
 #include "kut/DEFS.h"
 
 static pthread_mutex_t thread_mutex;
+static pthread_t *thread_in = NULL;
 
 struct thread_Thread {
   void (*fn) (void *);
@@ -48,7 +49,7 @@ pthread_t *thread_start2 (void (*fn)(void *), void *value) {
   return thr;
 }
 
-void thread_run (void (*fn)()) {
+void thread_run (void (*fn)(void)) {
   pthread_attr_t attr;
   pthread_attr_init(&attr);
   pthread_attr_setdetachstate(&attr, PTHREAD_CREATE_DETACHED);
@@ -72,8 +73,17 @@ void thread_join (pthread_t *thr) {
 }
 
 void thread_sync (void (*fn)(void)) {
+  pthread_t self = pthread_self();
+  if (thread_in && pthread_equal(self, *thread_in)) {
+    fn();
+    return;
+  }
+
   pthread_mutex_lock(&thread_mutex);
+  thread_in = MALLOC(pthread_t);
+  *thread_in = self;
   fn();
+  thread_in = NULL;
   pthread_mutex_unlock(&thread_mutex);
 }
 

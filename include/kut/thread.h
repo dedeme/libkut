@@ -16,7 +16,7 @@
 
 /// Launchs 'fn' in a new joinable thread.
 /// Example:
-///   /**/void fn() { puts("Here"); }
+///   /**/void fn(void) { puts("Here"); }
 ///   pthread_t *thr = thread_start(fn);
 ///   ...
 ///   thread_join(thr); // Waits for thr.
@@ -36,9 +36,9 @@ pthread_t *thread_start2 (void (*fn)(void *), void *value);
 
 /// Launch 'fn' in a new thread.
 /// Example:
-///   /**/void fn() { puts("Here"); }
+///   /**/void fn(void) { puts("Here"); }
 ///   thread_run((fn);
-void thread_run (void (*fn)());
+void thread_run (void (*fn)(void));
 
 /// Launch 'fn' in a new thread.
 /// Example:
