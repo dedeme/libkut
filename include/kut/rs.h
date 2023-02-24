@@ -15,11 +15,8 @@ Rs *rs_ok (void *value);
 /// Creates a failure result.
 Rs *rs_fail (char *msg);
 
-/// Returns NULL if 'this' is a failure.
-void *rs_get (Rs *this);
-
 /// Throws a illegal_state_exception_t if 'this' is a failure.
-void *rs_eget (Rs *this);
+void *rs_get (Rs *this);
 
 /// Returns the error field.
 /// If 'this' is ok returns "".

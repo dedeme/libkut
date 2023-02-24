@@ -6,7 +6,7 @@
 #ifndef LKUT_B64_H
   #define LKUT_B64_H
 
-#include "kut/bytes.h"
+#include "bytes.h"
 
 /// b64 -> utf-8
 /// Throws EXC_ILLEGAL_ARGUMENT if b64 has not a valid codification.

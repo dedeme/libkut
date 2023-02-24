@@ -24,18 +24,11 @@ Rs *rs_fail (char *msg) {
 }
 
 void *rs_get (Rs *this) {
-  return this->value;
-}
-
-/// Throws a illegal_state_exception_t if 'this' is a failure.
-void *rs_eget (Rs *this) {
   if (!this->value)
     EXC_ILLEGAL_STATE("Result is a faliure");
   return this->value;
 }
 
-/// Returns the error field.
-/// If 'this' is ok returns "".
 char *rs_error (Rs *this) {
   return this->error;
 }

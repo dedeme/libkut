@@ -203,8 +203,8 @@
   }
 
 #define TESTF(actual, expected) { \
-    char *__sactual = str_f("%.10f", actual); \
-    char *__sexpected = str_f("%.10f", expected); \
+    char *__sactual = str_f("%.10f", (double)actual); \
+    char *__sexpected = str_f("%.10f", (double)expected); \
     if (strcmp(__sactual, __sexpected)) \
     EXC_ILLEGAL_ARGUMENT("Test failed", __sexpected, __sactual) \
   }

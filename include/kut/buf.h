@@ -22,6 +22,12 @@ char *buf_str (Buf *this);
 /// 'strlen(buf_str(this))'.
 int buf_len (Buf *this);
 
+/// Adds 'length bytes of 'data' to 'buf'.
+/// 'length' must be less or equals to 'strlen(data)'.
+/// It is not necessary that 'data' be a null-terminated string, but it must
+/// not have any internal character \0
+void buf_add_buf (Buf *this, char *data, int length);
+
 /// Adds 'data' to 'this'.
 void buf_add(Buf *this, char *data);
 
