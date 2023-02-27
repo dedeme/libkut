@@ -58,7 +58,7 @@ Rs *tcp_accept (TcpServer *sv) {
 Rs *tcp_read (TcpConn *conn) {
   // <Bytes>
   Rs *bs_rs = tcp_read_bin(conn);
-  Bytes *bs = (Bytes *)bs_rs;
+  Bytes *bs = rs_get(bs_rs);
   if (!bs) return bs_rs;
   return rs_ok(bytes_to_str(bs));
 }
@@ -69,13 +69,14 @@ Rs *tcp_read_bin (TcpConn *conn) {
   int buffer = 8192;
   unsigned char bs[buffer];
   int len;
-  while ((len = (int)recv(conn->id, bs, buffer, 0)) > 0){
+  if ((len = (int)recv(conn->id, bs, buffer, 0)) > 0)
     bytes_add_bytes(r, bs, len);
-  }
+
   if (len == -1) {
     close(conn->id);
     return rs_fail(str_f("Fail reading on connection: %s", strerror(errno)));
   }
+
   return rs_ok(r);
 }
 
@@ -84,8 +85,9 @@ char *tcp_write (TcpConn *conn, char *s) {
 }
 
 char *tcp_write_bin (TcpConn *conn, Bytes *bs) {
-  if (send(conn->id, bytes_bs(bs), bytes_len(bs), 0))
+  if (send(conn->id, bytes_bs(bs), bytes_len(bs), 0) == -1)
      return str_f("Fail sending on connection: %s", strerror(errno));
+  fsync(conn->id);
   return "";
 }
 
@@ -94,7 +96,7 @@ Rs *tcp_dial (char *sv, int port) {
   struct sockaddr_in server;
   int id = socket(AF_INET , SOCK_STREAM , 0);
 	if (id == -1)
-    EXC_IO("Could not create socket");
+    return rs_fail("Could not create socket");
 
 	server.sin_family = AF_INET;
 	server.sin_port = htons(port);
@@ -102,9 +104,7 @@ Rs *tcp_dial (char *sv, int port) {
     struct hostent *he;
     if ((he = gethostbyname(sv)) == NULL)
       return rs_fail(str_f("Host '%s' not found", sv));
-
-    if (!inet_aton(he->h_addr, &server.sin_addr))
-      return rs_fail(str_f("Host '%s' not found", sv));
+    server.sin_addr = *(struct in_addr *) he->h_addr;
   }
 
 	if (connect(id , (struct sockaddr *)&server , sizeof(server)) < 0)
