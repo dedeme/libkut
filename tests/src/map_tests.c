@@ -5,6 +5,7 @@
 #include "kut/DEFS.h"
 #include "kut/map.h"
 #include "kut/sys.h"
+#include "kut/js.h"
 
 void map_tests(void) {
   puts(">>> map:");
@@ -65,6 +66,14 @@ void map_tests(void) {
   sys_set_locale("C");
   keys = map_keys(m);
   TEST(arr_join(keys, "-"), "él-tres-uno");
+
+  TESTI(map_size(
+    map_from_js(map_to_js(map_new(), (FTO)js_ws), (FFROM)js_rs)), 0);
+  // <char>
+  Map *m2 = map_from_js(map_to_js(m, (FTO)js_ws), (FFROM)js_rs);
+  TEST(opt_get(map_get(m2, "uno")), "1");
+  TEST(opt_get(map_get(m2, "él")), "2");
+  TEST(opt_get(map_get(m2, "tres")), "3");
 
   puts("... Finished");
 }

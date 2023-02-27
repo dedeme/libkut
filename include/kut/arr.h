@@ -1,12 +1,14 @@
 // Copyright 21-Jan-2023 ºDeme
 // GNU General Public License - V3 <http://www.gnu.org/licenses/>
 
-/// Array object
+/// Array object.
 
 #ifndef LKUT_ARR_H
   #define LKUT_ARR_H
 
 #include "opt.h"
+
+typedef struct it_It It;
 
 /// Array object.
 typedef struct arr_Arr Arr;
@@ -104,10 +106,23 @@ int arr_all (Arr *this, int (*pred)(void *e));
 /// 'pred' can be cast to FPRED.
 int arr_any (Arr *this, int (*pred)(void *e));
 
+/// Executes 'fn' with each element of 'this'.
+void arr_each(Arr *this, void (*fn)(void *e));
+
+/// Executes 'fn' with each element of 'this' and its array index.
+void arr_each_ix(Arr *this, void (*fn)(void *e, int ix));
+
+/// Returns TRUE if 'a1' has the same elements number as 'a2' and f(e1, e1) for
+/// each element returns TRUE.
+int arr_eq(Arr *a1, Arr *a2, int (*feq)(void *e1, void *e2));
+
 /// Returns the index of the first elements which returns 'TRUE'
 /// with 'pred', or -1 if such element does not exist.
 /// 'pred' can be cast to FPRED.
 int arr_index (Arr *this, int (*pred)(void *e));
+
+/// Equals to (arr_index(a, fn) != -1)
+int arr_contains (Arr *this, int (*pred)(void *e));
 
 /// Returns the index of the last elements which returns 'TRUE'
 /// with 'pred', or -1 if such element does not exist.
@@ -145,7 +160,7 @@ Arr *arr_drop (Arr *this, int n);
 /// 'pred' can be cast to FPRED.
 Arr *arr_dropf (Arr *this, int (*pred)(void *e));
 
-/// Returns a new Arr with every element which returns 'TO' with 'pred'.
+/// Returns a new Arr with every element which returns 'TRUE' with 'pred'.
 /// 'pred' can be cast to FPRED.
 Arr *arr_filter_to (Arr *this, int (*pred)(void *e));
 
@@ -184,5 +199,21 @@ char *arr_cjoin(Arr *a, char sep);
 /// Joins elements of 'a', separated by 'sep'.
 /// 'a' is Arr<char>.
 char *arr_join(Arr *a, char *sep);
+
+/// Creates an iterator over 'this'.
+It *arr_to_it (Arr *this);
+
+/// Creates an Arr from 'it'.
+Arr *arr_from_it (It *it);
+
+/// Returns this JSONized.
+///   this: Container.
+///   to  : Converter of container element to JSON.
+char *arr_to_js (Arr *this, char *(*to)(void *e));
+
+/// Returns the container from its JSON representation.
+///   js  : Container JSONized.
+///   from: Converter from JSON to container element.
+Arr *arr_from_js (char *js, void *(*from)(char *ejs));
 
 #endif

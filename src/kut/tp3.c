@@ -18,14 +18,14 @@ Tp3 *tp3_new (void *e1, void *e2, void *e3) {
   return this;
 }
 
-void *tp_e1 (Tp3 *this) {
+void *tp3_e1 (Tp3 *this) {
   return this->e1;
 }
 
-void *tp_e2 (Tp3 *this) {
+void *tp3_e2 (Tp3 *this) {
   return this->e2;
 }
 
-void *tp_e3 (Tp3 *this) {
+void *tp3_e3 (Tp3 *this) {
   return this->e3;
 }

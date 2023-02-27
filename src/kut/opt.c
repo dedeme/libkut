@@ -3,6 +3,7 @@
 
 #include "kut/opt.h"
 #include "kut/DEFS.h"
+#include "kut/js.h"
 
 struct opt_Opt {
   void *value;
@@ -29,4 +30,15 @@ void *opt_eget (Opt *this) {
     EXC_ILLEGAL_STATE("Option is null")
 
   return this->value;
+}
+
+char *opt_to_js (Opt *this, char *(*to)(void *e)) {
+  if (this->value) return to(this->value);
+  return js_wn();
+}
+
+
+Opt *opt_from_js (char *js, void *(*from)(char *jse)) {
+  if (js_is_null(js)) return opt_none();
+  return opt_some(from(js));
 }

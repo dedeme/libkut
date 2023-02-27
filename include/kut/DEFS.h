@@ -127,9 +127,9 @@
 ///   _TRY
 /// NOTE: CATCH block must return 'void'
 #define TRY { \
-  jmp_buf *_TRY_buf = MALLOC(jmp_buf); \
-  exc_add(_TRY_buf); \
-  if (!setjmp(*_TRY_buf)) { \
+  jmp_buf *__TRY_buf = MALLOC(jmp_buf); \
+  exc_add(__TRY_buf); \
+  if (!setjmp(*__TRY_buf)) { \
 
 /// See TRY.
 ///   e <literal>: Variable holding the exception.
@@ -169,7 +169,7 @@
   }
 
 /// Throw a expection if type 'exc_illegal_argument_t'.
-///   var <char *>     : Argument name.
+///   msg <char *>     : Exception message.
 ///   expected <char *>: Expected argument value.
 ///   actual <char *>  : Actual argument value.
 /// Example:
@@ -182,18 +182,21 @@
 /// Example:
 ///   EXC_ILLEGAL_STATE("Fail");
 #define EXC_ILLEGAL_STATE(msg) \
-  THROW(exc_illegal_state_t, exc_illegal_state(msg))
+  THROW(exc_illegal_state_t, msg)
 
 /// Throws a 'exc_io_t'.
 ///   msg <char *>     : Exception message.
 /// Example:
 ///   EXC_IO("Fail");
 #define EXC_IO(msg) \
-  THROW(exc_io_t, exc_io(msg))
+  THROW(exc_io_t, msg)
 
-#define TEST(actual, expected) \
-  if (strcmp(actual, expected)) \
-  EXC_ILLEGAL_ARGUMENT("Test failed", expected, actual)
+#define TEST(actual, expected) { \
+    char *__actual = actual; \
+    char *__expected = expected; \
+    if (strcmp(__actual, __expected)) \
+    EXC_ILLEGAL_ARGUMENT("Test failed", __expected, __actual) \
+  }
 
 #define TESTI(actual, expected) { \
     char *__sactual = str_f("%d", actual); \
@@ -209,16 +212,44 @@
     EXC_ILLEGAL_ARGUMENT("Test failed", __sexpected, __sactual) \
   }
 
-///
+/// Type of a map operation.
+/// Example:
+///   assert (str_eq(arr_join(arr_map(
+///     arr_new_from("a", "b", NULL),
+///     (FMAP)str_to_upper
+///   ), ""), "AB"));
+
 typedef void *(*FMAP)(void *);
 
-///
+/// Type of a comparison operation.
+/// Example:
+///   assert(arr_eq(arr_new(), arr_new(), (FEQ)str_eq));
 typedef int (*FEQ)(void *, void *);
 
-///
+/// Type of a procedure operation.
+/// Example:
+///   char *rs = "";
+///     //--
+///     void fnn(char *n) { rs = str_f("%s%s", rs, n); }
+///   arr_each(arr_new_from("1", "2", "3", NULL), (FPROC)fnn);
+///   assert(str_eq(rs, "123"));
 typedef void (*FPROC)(void *);
 
-///
+/// Type of a perdicate operation.
+/// Example:
+///     //--
+///     void feq(char *s) { str_eq(s, "a"); }
+///   assert(arr_all(arr_new_from("a", "a", "a", NULL), (FPRED)feq));
 typedef int (*FPRED)(void *);
+
+/// Type of a 'to JSON' operation.
+/// Example:
+///   TEST(arr_to_js(mk(), (FTO)js_ws), "[\"a\",\"b\",\"c\"]");
+typedef char *(*FTO)(void *);
+
+/// Type of a 'from JSON' operation.
+/// Example:
+///   TEST(arr_join(arr_from_js("[\"a\",\"b\",\"c\"]", (FFROM)js_rs), ""), "abc");
+typedef void *(*FFROM)(char *js);
 
 #endif

@@ -11,7 +11,7 @@ static char *b64_base =
 
 char *cryp_genk (int lg) {
   if (lg <= 0)
-    EXC_ILLEGAL_ARGUMENT("lg", "Value < 0", str_f("%d", lg));
+    EXC_ILLEGAL_ARGUMENT("Value out of range", "Value < 0", str_f("%d", lg));
 
   char *r = ATOMIC(lg + 1);
   char *p = r + lg;
@@ -24,7 +24,7 @@ char *cryp_genk (int lg) {
 
 char *cryp_key (char *key, int lg) {
   if (!*key)
-    EXC_ILLEGAL_ARGUMENT("key", "Value != \"\"", "\"\"");
+    EXC_ILLEGAL_ARGUMENT("Wrong key", "Value != \"\"", "\"\"");
 
   char *k0 = str_f(
     "%scodified in irreversibleDeme is good, very good!\n\r8@@", key);
@@ -76,7 +76,7 @@ char *cryp_key (char *key, int lg) {
 
 char *cryp_encode (char *k, char *s) {
   if (!*k)
-    EXC_ILLEGAL_ARGUMENT("k", "Value != \"\"", "\"\"");
+    EXC_ILLEGAL_ARGUMENT("Wrong key", "Value != \"\"", "\"\"");
 
   char *b64 = b64_encode(s);
 
@@ -95,7 +95,7 @@ char *cryp_encode (char *k, char *s) {
 
 char *cryp_decode (char *k, char *c) {
   if (!*k)
-    EXC_ILLEGAL_ARGUMENT("k", "Value != \"\"", "\"\"");
+    EXC_ILLEGAL_ARGUMENT("Wrong key", "Value != \"\"", "\"\"");
 
   Bytes *bs = b64_decode_bytes(c);
 

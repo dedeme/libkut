@@ -3,6 +3,7 @@
 
 #include "kut/bytes.h"
 #include "kut/DEFS.h"
+#include "kut/b64.h"
 
 struct bytes_Bytes {
   unsigned char *bs;
@@ -55,4 +56,32 @@ void bytes_add (Bytes *this, Bytes *another) {
 
 void bytes_add_str (Bytes *this, char *s) {
   bytes_add_bytes(this, (unsigned char *)s, strlen(s));
+}
+
+char *bytes_to_str(Bytes *this) {
+  int len = this->length;
+  char *r = ATOMIC(len + 1);
+  memcpy(r, this->bs, len);
+  r[len] = 0;
+  return r;
+}
+
+char *bytes_to_js(Bytes *this) {
+  char *b64 = b64_encode_bytes(this);
+  size_t len = strlen(b64);
+  char *r = ATOMIC(len + 3);
+  r[0] = '"';
+  memcpy(r + 1, b64, len);
+  r[len + 1] = '"';
+  r[len + 2] = 0;
+  return r;
+}
+
+Bytes *bytes_from_js(char *js) {
+  size_t len = strlen(js) - 2;
+  char *b64 = ATOMIC(len + 1);
+  memcpy(b64, js + 1, len);
+  b64[len] = 0;
+
+  return b64_decode_bytes(b64);
 }

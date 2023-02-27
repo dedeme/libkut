@@ -510,7 +510,7 @@ char *str_from_iso(char *s) {
 
 char *str_to_upper (char *s) {
   unsigned *ws = (unsigned *)opt_get(str_to_unicode(s));
-  if (!ws) EXC_ILLEGAL_ARGUMENT("ws", "Valid utf8 string", "Wrong value");
+  if (!ws) EXC_ILLEGAL_ARGUMENT("Bad string", "Valid utf8 string", "Wrong value");
 
   unsigned *p = ws;
   while (*p) {
@@ -519,13 +519,13 @@ char *str_to_upper (char *s) {
   }
 
   char *r = (char *)opt_get(str_from_unicode(ws));
-  if (!r) EXC_ILLEGAL_ARGUMENT("r", "Valid Unicode wchar", "Wrong value");
+  if (!r) EXC_ILLEGAL_ARGUMENT("Interal error", "Valid Unicode wchar", "Wrong value");
   return r;
 }
 
 char *str_to_lower (char *s) {
   unsigned *ws = (unsigned *)opt_get(str_to_unicode(s));
-  if (!ws) EXC_ILLEGAL_ARGUMENT("ws", "Valid utf8 string", "Wrong value");
+  if (!ws) EXC_ILLEGAL_ARGUMENT("Bad string", "Valid utf8 string", "Wrong value");
 
   unsigned *p = ws;
   while (*p) {
@@ -534,7 +534,7 @@ char *str_to_lower (char *s) {
   }
 
   char *r = (char *)opt_get(str_from_unicode(ws));
-  if (!r) EXC_ILLEGAL_ARGUMENT("r", "Valid Unicode wchar", "Wrong value");
+  if (!r) EXC_ILLEGAL_ARGUMENT("Internal error", "Valid Unicode wchar", "Wrong value");
   return r;
 }
 
@@ -572,5 +572,4 @@ char *str_from_escape (char *s) {
 
   return str_left(buf_str(bf), buf_len(bf) - 1);
 }
-
 

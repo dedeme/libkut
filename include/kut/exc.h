@@ -77,23 +77,15 @@ char *exc_range (int begin, int end, int index);
 #define exc_illegal_argument_t "argument"
 
 /// Exception for argument with a wrong value.
-///   argument_name: Name of wrong argument.
-///   expected     : Value expected.
-///   actual       : Actual value.
-char *exc_illegal_argument (char *argument_name, char *expected, char *actual);
+///   msg     : Exception message.
+///   expected: Value expected.
+///   actual  : Actual value.
+char *exc_illegal_argument (char *msg, char *expected, char *actual);
 
 ///
 #define exc_illegal_state_t "state"
 
-/// Exception for attempting to use an object in wrong state.
-///   cause: Description of problem.
-char *exc_illegal_state (char *cause);
-
 ///
 #define exc_io_t "io"
-
-/// Exception for Input - Output error.
-///   cause: Description of problem.
-char *exc_io (char *cause);
 
 #endif

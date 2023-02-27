@@ -4,6 +4,7 @@
 #include "arr_tests.h"
 #include "kut/DEFS.h"
 #include "kut/buf.h"
+#include "kut/js.h"
 
 static int greater(double *e1, double *e2) {
   return *e1 > *e2;
@@ -132,6 +133,22 @@ void arr_tests(void) {
   }_EACH
   assert(*sum == 511);
 
+  *sum = 0;
+    //--
+    void each_fn (double *n) { *sum += *n; }
+  arr_each(arr_new(), (FPROC)each_fn);
+  assert(*sum == 0);
+  arr_each(ia, (FPROC)each_fn);
+  assert(*sum == 511);
+
+  int isum = 0;
+    //--
+    void each_fn2 (double *n, int ix) { isum += ix; }
+  arr_each_ix(arr_new(), (void(*)(void *, int))each_fn2);
+  TESTI(isum, 0);
+  arr_each_ix(ia, (void(*)(void *, int))each_fn2);
+  TESTI(isum, 28);
+
   arr_remove_range(ia, 5, 8);
   arr_shuffle(ia);
   *sum = 0;
@@ -177,8 +194,23 @@ void arr_tests(void) {
   assert(!strcmp(arr_get(sa, 1), "d"));
   assert(!strcmp(arr_get(sa, 2), "e"));
 
+  assert (arr_eq(arr_new(), arr_new(), (FEQ)str_eq));
+  assert(arr_eq(
+    arr_new_from("a", "b", NULL), arr_new_from("a", "b", NULL),
+    (FEQ)str_eq
+  ));
+  assert(!arr_eq(
+    arr_new_from("b", NULL), arr_new_from("a", "b", NULL),
+    (FEQ)str_eq
+  ));
+  assert(!arr_eq(
+    arr_new_from("a", "a", NULL), arr_new_from("a", "b", NULL),
+    (FEQ)str_eq
+  ));
+
   int pred (void *s) { return *((char *)s) < 'd'; }
   assert(arr_index(arr_new(), pred) == -1);
+  assert(!arr_contains(arr_new(), pred));
   assert(arr_last_index(arr_new(), pred) == -1);
   assert(!opt_get(arr_find(arr_new(), pred)));
   assert(!opt_get(arr_find_last(arr_new(), pred)));
@@ -187,6 +219,9 @@ void arr_tests(void) {
   assert(arr_index(arr_new_from("a", "b", NULL), pred) == 0);
   assert(arr_index(arr_new_from("d", "e", "b", NULL), pred) == 2);
   assert(arr_index(arr_new_from("d", "e", NULL), pred) == -1);
+  assert(arr_contains(arr_new_from("a", "b", NULL), pred));
+  assert(arr_contains(arr_new_from("d", "e", "b", NULL), pred));
+  assert(!arr_contains(arr_new_from("d", "e", NULL), pred));
   assert(arr_last_index(arr_new_from("a", "b", NULL), pred) == 1);
   assert(arr_last_index(arr_new_from("a", "b", "a", NULL), pred) == 2);
   assert(arr_last_index(arr_new_from("d", "e", "b", NULL), pred) == 2);
@@ -298,11 +333,11 @@ void arr_tests(void) {
   assert(test("(a-a)(b-b)(c-c)", arr_zip(mk(), mk(), zip)));
 
   //(
-    void *zip3(void *e1, void *e2, void *e3) {                                                      //
+    void *zip3(void *e1, void *e2, void *e3) {
       char *s = ATOMIC(80);
       sprintf(s, "(%s-%s-%s)", (char*)e1, (char *)e2, (char *)e3);
       return s;
-    }                                                                           //
+    }
   //)
   assert(test("", arr_zip3(arr_new(), arr_new(), arr_new(),zip3)));
   assert(test("", arr_zip3(arr_new(), mk(), mk(), zip3)));
@@ -326,6 +361,11 @@ void arr_tests(void) {
   assert(str_eq(arr_get(sa, 0), "a"));
   assert(str_eq(arr_get(sa, 1), "b"));
   assert(str_eq(arr_get(sa, 2), "c"));
+
+  TEST(arr_to_js(arr_new(), (FTO)js_ws), "[]");
+  TEST(arr_join(arr_from_js("[]", (FFROM)js_rs), ""), "");
+  TEST(arr_to_js(mk(), (FTO)js_ws), "[\"a\",\"b\",\"c\"]");
+  TEST(arr_join(arr_from_js("[\"a\",\"b\",\"c\"]", (FFROM)js_rs), ""), "abc");
 
   // 'arr_cjoin()' and 'arr_join()' are tested in 'str_tests()'.
 

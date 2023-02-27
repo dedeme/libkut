@@ -5,6 +5,8 @@
 #include "kut/DEFS.h"
 #include "kut/js.h"
 #include "kut/sys.h"
+#include "kut/opt.h"
+#include "kut/rs.h"
 
 void js_tests(void) {
   puts(">>> js:");
@@ -253,6 +255,27 @@ void js_tests(void) {
   TEST(js_wf(1234.34, 2), "1234.34");
   sys_set_locale("C");
   TEST(str_f("%.2f", 1234.34), "1234.34");
+
+  // Opt and Rs
+
+  assert(!opt_get(opt_from_js(opt_to_js(opt_none(), (FTO)js_ws), (FFROM)js_rs)));
+  TEST(
+    opt_get(opt_from_js(opt_to_js(opt_some("A"), (FTO)js_ws), (FFROM)js_rs)),
+    "A"
+  );
+
+  TEST(
+    rs_get(rs_from_js(rs_to_js(rs_ok("A"), (FTO)js_ws), (FFROM)js_rs)),
+    "A"
+  );
+  TEST(
+    rs_error(rs_from_js(rs_to_js(rs_ok("A"), (FTO)js_ws), (FFROM)js_rs)),
+    ""
+  );
+  TEST(
+    rs_error(rs_from_js(rs_to_js(rs_fail("A"), (FTO)js_ws), (FFROM)js_rs)),
+    "A"
+  );
 
   puts("... Finished");
 }

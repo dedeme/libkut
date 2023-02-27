@@ -19,9 +19,9 @@ char *kv_key (Kv *this);
 void *kv_value (Kv *this);
 
 ///
-// Js *kv_to_js (Kv *this, Js *(*to)(void *e)); -------------------
+char *kv_to_js (Kv *this, char *(*to)(void *e));
 
 ///
-// Kv *kv_from_js (Js *js, void *(*from)(Js *jse)); ------------------
+Kv *kv_from_js (char *js, void *(*from)(char *jse));
 
 #endif

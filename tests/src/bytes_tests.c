@@ -42,5 +42,8 @@ void bytes_tests(void) {
   assert(bytes_len(b1) == 1);
   assert(*bytes_bs(b1) == 'c');
 
+  TEST(bytes_to_str(bytes_from_str("")), "");
+  TEST(bytes_to_str(bytes_from_str("abc")), "abc");
+
   puts("... Finished");
 }

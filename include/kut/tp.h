@@ -18,9 +18,4 @@ void *tp_e1 (Tp *this);
 /// Returns the second element.
 void *tp_e2 (Tp *this);
 
-// Js *tp_to_js (Tp *this, Js *(*to1)(void *e), Js *(*to2)(void *e));
-
-// Tp *tp_from_js (Js *js, void *(*from1)(Js *jse), void *(*from2)(Js *jse));
-
-
 #endif

@@ -65,7 +65,7 @@ static Bytes *base64_decode(
 ) {
   if (input_length % 4 != 0)
     EXC_ILLEGAL_ARGUMENT(
-      "data", "Length %% 4 != 0", str_f("Length %ld", input_length)
+      "Bad B64 string", "Length %% 4 != 0", str_f("Length %ld", input_length)
     );
 
   *output_length = input_length / 4 * 3;

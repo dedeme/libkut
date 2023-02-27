@@ -22,9 +22,9 @@ void *opt_get (Opt *this);
 void *opt_eget (Opt *this);
 
 ///
-// Js *opt_to_js (Opt *this, Js *(*to)(void *e)); -------------------
+char *opt_to_js (Opt *this, char *(*to)(void *e));
 
 ///
-// Opt *opt_from_js (Js *js, void *(*from)(Js *jse)); ------------------
+Opt *opt_from_js (char *js, void *(*from)(char *jse));
 
 #endif

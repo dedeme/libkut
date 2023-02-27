@@ -1,7 +1,7 @@
 // Copyright 24-Jan-2023 ºDeme
 // GNU General Public License - V3 <http://www.gnu.org/licenses/>
 
-/// JSON encoder - decoder
+/// JSON encoder - decoder.
 
 #ifndef LKUT_JS_H
   #define LKUT_JS_H

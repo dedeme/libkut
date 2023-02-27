@@ -36,4 +36,17 @@ void bytes_add(Bytes *this, Bytes *another);
 /// Adds to 'this' a copy of 's' without the ending zero.
 void bytes_add_str(Bytes *this, char *s);
 
+/// Returns the array eveloped in 'char *' format.
+/// NOTE: Interal zeroes will truncate the string.
+char *bytes_to_str(Bytes *this);
+
+/// Returns 's' as Bytes.
+Bytes *bytes_from_str (char *s);
+
+/// Returns a JSON representation of 'this'.
+char *bytes_to_js(Bytes *this);
+
+/// Returns a 'Bytes' from its JSON representation.
+Bytes *bytes_from_js(char *js);
+
 #endif

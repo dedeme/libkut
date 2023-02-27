@@ -8,6 +8,10 @@
 
 #include "opt.h"
 
+/// Concatenates several file names (at least 2).
+/// Variable argumens must finish with NULL.
+char *path_cat (char *name1, char *name2, ...);
+
 /// Returns base name of 'path' after removing all trailing '/'.
 /// If path is "" or is root, it returns "".
 char *path_base (char *path);

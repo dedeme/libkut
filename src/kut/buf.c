@@ -59,3 +59,4 @@ void buf_reset(Buf *this) {
   memset(this->str, 0, this->bf_size);
   this->len = 0;
 }
+

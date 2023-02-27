@@ -1,7 +1,7 @@
 // Copyright 20-Jan-2023 ºDeme
 // GNU General Public License - V3 <http://www.gnu.org/licenses/>
 
-#include "path_tests.h"
+#include "str_tests.h"
 #include "kut/DEFS.h"
 #include "kut/str.h"
 #include "kut/arr.h"

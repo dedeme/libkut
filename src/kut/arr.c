@@ -5,6 +5,8 @@
 #include "kut/arr.h"
 #include "kut/DEFS.h"
 #include "kut/buf.h"
+#include "kut/js.h"
+#include "kut/it.h"
 
 struct arr_Arr {
   void **es; // Start elements.
@@ -330,11 +332,37 @@ int arr_any (Arr *this, int (*pred)(void *e)) {
   return 0;
 }
 
+void arr_each(Arr *this, void (*fn)(void *e)) {
+  void **p = this->es;
+  while (p < this->end) fn(*p++);
+}
+
+void arr_each_ix(Arr *this, void (*fn)(void *e, int ix)) {
+  void **p = this->es;
+  int ix = 0;
+  while (p < this->end) fn(*p++, ix++);
+}
+
+int arr_eq(Arr *a1, Arr *a2, int (*feq)(void *e1, void *e2)) {
+  if (arr_size(a1) != arr_size(a2)) return FALSE;
+  void **p1 = a1->es;
+  void **p2 = a2->es;
+  while (p1 < a1->end) if (!feq(*p1++, *p2++)) return FALSE;
+  return TRUE;
+}
+
 int arr_index (Arr *this, int (*pred)(void *e)) {
   void **es = this->es;
   void **p = es;
   while (p < this->end) if (pred(*p++)) return p - es - 1;
   return -1;
+}
+
+int arr_contains (Arr *this, int (*pred)(void *e)) {
+  void **es = this->es;
+  void **p = es;
+  while (p < this->end) if (pred(*p++)) return TRUE;
+  return FALSE;
 }
 
 Opt *arr_find(Arr *this, int (*pred)(void *e)) {
@@ -534,3 +562,42 @@ char *arr_join(Arr *a, char *sep) {
   return str_new(buf_str(bf));
 }
 
+// -------------------------------------------------------------------------- //
+typedef struct {                                                              //
+  void **es;                                                                  //
+  size_t n;                                                                   //
+  size_t i;                                                                   //
+} arr_to_it_O;                                                                //
+static Opt *to_it_next(arr_to_it_O *o) {                                      //
+  size_t i = o->i;                                                            //
+  if (i < o->n) {                                                             //
+    o->i += 1;                                                                //
+    return opt_some(o->es[i]);                                                //
+  } else {                                                                    //
+    return opt_none();                                                        //
+  }                                                                           //
+}                                                                             //
+// -------------------------------------------------------------------------- //
+It *arr_to_it (Arr *this) {
+  arr_to_it_O *o = MALLOC(arr_to_it_O);
+  o->es = this->es;
+  o->n = arr_size(this);
+  o->i = 0;
+  return it_new(o, (Opt *(*)(void*))to_it_next);
+}
+
+Arr *arr_from_it (It *it) {
+  Arr *r = arr_new();
+  while (it_has_next(it)) {
+    arr_push(r, it_next(it));
+  }
+  return r;
+}
+
+char *arr_to_js (Arr *this, char *(*to)(void *e)) {
+  return js_wa((Arr *)arr_map(this, (FMAP)to));
+}
+
+Arr *arr_from_js (char *js, void *(*from)(char *ejs)) {
+  return arr_map(js_ra(js), (FMAP)from);
+}

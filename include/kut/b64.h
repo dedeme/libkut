@@ -1,7 +1,7 @@
 // Copyright 22-Jan-2023 ºDeme
 // GNU General Public License - V3 <http://www.gnu.org/licenses/>
 
-/// B64 encoder - decoder
+/// B64 encoder - decoder.
 
 #ifndef LKUT_B64_H
   #define LKUT_B64_H

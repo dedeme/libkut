@@ -1,14 +1,20 @@
 // Copyright 21-Jan-2023 ºDeme
 // GNU General Public License - V3 <http://www.gnu.org/licenses/>
 
-/// Map object
+/// System utilities.
 
 #ifndef LKUT_SYS_H
   #define LKUT_SYS_H
 
+#include "rs.h"
+#include "map.h"
+
 /// Initializes the system.
 /// It should be called only one time at the beginning of the program.
 void sys_init(void);
+
+/// Returns a Map<char> with the environment variables.
+Map *sys_environ(void);
 
 /// Sets LC_ALL, for example:
 ///   sys_set_locale("es_ES.utf8")
@@ -27,5 +33,22 @@ int sys_rnd_i (int top);
 
 /// Stops the current thread.
 void sys_sleep (int millis);
+
+/// Returns the current user home directory.
+int sys_user_id(void);
+
+/// Returns the current user home directory.
+/// If the current user can not be found, it returns "".
+char *sys_user_name();
+
+/// Returns the current user home directory.
+/// If the current user can not be found, it returns "".
+char *sys_user_home(void);
+
+/// Executes 'command' and returns a Rs<char> with values: [stderr - stdout].
+/// If the command can not be exectued returns the stderr message
+/// "NOEXEC: <cmd>", where 'cmd' is 'command'.
+
+Rs *sys_cmd(char *command);
 
 #endif

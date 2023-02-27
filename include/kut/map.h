@@ -53,11 +53,11 @@ void map_sort_locale(Map *this);
 /// Returns this JSONized.
 ///   this: Container.
 ///   to  : Converter of container value to JSON.
-//char *map_to_js (Map *this, char *(*to)(void *e));
+char *map_to_js (Map *this, char *(*to)(void *e));
 
 /// Returns the container from its JSON representation.
 ///   js  : Container JSONized.
 ///   from: Converter from JSON to container value.
-//Map *map_from_js (char *js, void *(*from)(char *ejs));
+Map *map_from_js (char *js, void *(*from)(char *ejs));
 
 #endif

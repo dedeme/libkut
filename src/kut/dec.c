@@ -28,12 +28,12 @@ int dec_stoi (char *s) {
 long dec_stol (char *s) {
   s = str_trim(s);
   if (!*s)
-    EXC_ILLEGAL_ARGUMENT("s", "An integer", "A empty string")
+    EXC_ILLEGAL_ARGUMENT("Bad number", "An integer", "A empty string")
 
   char *tmp;
   long r = strtol(s, &tmp, 0);
   if (*tmp)
-    EXC_ILLEGAL_ARGUMENT("s", "A valid number", s)
+    EXC_ILLEGAL_ARGUMENT("Bad number", "A valid number", s)
 
   return r;
 }
@@ -45,13 +45,13 @@ float dec_stof (char *s) {
 double dec_stod (char *s) {
   s = str_trim(s);
   if (!*s)
-    EXC_ILLEGAL_ARGUMENT("s", "A double", "A empty string")
+    EXC_ILLEGAL_ARGUMENT("Bad number", "A double", "A empty string")
 
   if (str_starts(s, "-0")) s = str_right(s, 1);
   char *tmp;
   double r = strtod(s, &tmp);
   if (*tmp)
-    EXC_ILLEGAL_ARGUMENT("s", "A valid number", s)
+    EXC_ILLEGAL_ARGUMENT("Bad number", "A valid number", s)
 
   return r;
 }

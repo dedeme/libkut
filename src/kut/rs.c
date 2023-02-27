@@ -3,6 +3,7 @@
 
 #include "kut/rs.h"
 #include "kut/DEFS.h"
+#include "kut/js.h"
 
 struct rs_Rs {
   char *error;
@@ -24,11 +25,31 @@ Rs *rs_fail (char *msg) {
 }
 
 void *rs_get (Rs *this) {
-  if (!this->value)
-    EXC_ILLEGAL_STATE("Result is a faliure");
   return this->value;
 }
 
 char *rs_error (Rs *this) {
   return this->error;
+}
+
+char *rs_to_js (Rs *this, char *(*to)(void *e)) {
+  return (*this->error)
+    ? js_wa(arr_new_from(
+        js_ws(this->error),
+        js_wn(),
+        NULL
+      ))
+    : js_wa(arr_new_from(
+        js_ws(""),
+        to(this->value),
+        NULL
+      ));
+  ;
+}
+
+Rs *rs_from_js (char *js, void *(*from)(char *jse)) {
+  // <char>
+  Arr *a = js_ra(js);
+  char *error = js_rs(arr_get(a, 0));
+  return (*error) ? rs_fail(error) : rs_ok(from(arr_get(a, 1)));
 }

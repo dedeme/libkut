@@ -9,6 +9,9 @@
 void path_tests(void) {
   puts(">>> path:");
 
+  TEST(path_cat("a", "b", NULL), "a/b");
+  TEST(path_cat("a", "b", "c", NULL), "a/b/c");
+
   TEST(path_base(""), "");
   TEST(path_base("/"), "");
   TEST(path_base("ab"), "ab");

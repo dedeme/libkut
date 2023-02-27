@@ -15,6 +15,10 @@
 #include "map_tests.h"
 #include "js_tests.h"
 #include "dec_tests.h"
+#include "time_tests.h"
+#include "file_tests.h"
+#include "regex_tests.h"
+#include "it_tests.h"
 
 int main(int argc, char *argv[]) {
   sys_init();
@@ -31,4 +35,8 @@ int main(int argc, char *argv[]) {
   map_tests();
   js_tests();
   dec_tests();
+  time_tests();
+  file_tests();
+  regex_tests();
+  it_tests();
 }

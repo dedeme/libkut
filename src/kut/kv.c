@@ -3,6 +3,7 @@
 
 #include "kut/kv.h"
 #include "kut/DEFS.h"
+#include "kut/js.h"
 
 struct kv_Kv {
   char *key;
@@ -22,4 +23,21 @@ char *kv_key (Kv *this) {
 
 void *kv_value (Kv *this) {
   return this->value;
+}
+
+char *kv_to_js (Kv *this, char *(*to)(void *e)) {
+  return js_wa(arr_new_from(
+    js_ws(this->key),
+    to(this->value),
+    NULL
+  ));
+}
+
+Kv *kv_from_js (char *js, void *(*from)(char *ejs)) {
+  // <char>
+  Arr *a = js_ra(js);
+  return kv_new(
+    js_rs(arr_get(a, 0)),
+    from(arr_get(a, 1))
+  );
 }

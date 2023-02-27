@@ -21,13 +21,5 @@ void *tp3_e2 (Tp3 *this);
 /// Returns the therd element.
 void *tp3_e3 (Tp3 *this);
 
-// Js *tp3_to_js (
-//   Tp *this, Js *(*to1)(void *e), Js *(*to2)(void *e), Js *(*to3)(void *e)
-// );
-
-// Tp3 *tp3_from_js (
-//   Js *js, void *(*from1)(Js *jse), void *(*from2)(Js *jse), void *(*from3)(Js *jse)
-// );
-
 
 #endif

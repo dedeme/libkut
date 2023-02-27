@@ -26,7 +26,7 @@ Kob *kob_bool(int value) {
 int kob_get_bool(Kob *this) {
   if (this->type != kob_BOOL)
     EXC_ILLEGAL_ARGUMENT (
-      "this->type",
+      "Bad type",
       kob_type_to_str(kob_BOOL),
       kob_type_to_str(this->type)
     );
@@ -50,7 +50,7 @@ Kob *kob_int(int value) {
 int kob_get_int(Kob *this) {
   if (this->type != kob_INT)
     EXC_ILLEGAL_ARGUMENT (
-      "this->type",
+      "Bad type",
       kob_type_to_str(kob_INT),
       kob_type_to_str(this->type)
     );
@@ -74,7 +74,7 @@ Kob *kob_float(double value) {
 double kob_get_float(Kob *this) {
   if (this->type != kob_FLOAT)
     EXC_ILLEGAL_ARGUMENT (
-      "this->type",
+      "Bad type",
       kob_type_to_str(kob_FLOAT),
       kob_type_to_str(this->type)
     );
@@ -96,7 +96,7 @@ Kob *kob_str(char *s) {
 char *kob_get_str(Kob *this) {
   if (this->type != kob_STRING)
     EXC_ILLEGAL_ARGUMENT (
-      "this->type",
+      "Bad type",
       kob_type_to_str(kob_STRING),
       kob_type_to_str(this->type)
     );
@@ -118,7 +118,7 @@ Kob *kob_arr(Arr *a) {
 Arr *kob_get_arr(Kob *this) {
   if (this->type != kob_ARRAY)
     EXC_ILLEGAL_ARGUMENT (
-      "this->type",
+      "Bad type",
       kob_type_to_str(kob_ARRAY),
       kob_type_to_str(this->type)
     );
@@ -145,6 +145,6 @@ char *kob_type_to_str (enum KobType type) {
     case kob_MAP:
       return "Map";
   }
-  EXC_ILLEGAL_ARGUMENT("type", str_f("%d", type), "(0 to 5)");
+  EXC_ILLEGAL_ARGUMENT("Bad type identifier", str_f("%d", type), "(0 to 5)");
   return NULL;
 }

@@ -3,6 +3,7 @@
 
 #include "kut/map.h"
 #include "kut/DEFS.h"
+#include "kut/js.h"
 
 Map *map_new(void) {
   return (Map *)arr_new();
@@ -95,4 +96,18 @@ void map_sort_locale(Map *this) {
     }
   //)
   arr_sort((Arr *)this, (FEQ)greater);
+}
+
+// this is Map<char>
+char *map_to_js(Map *this, char *(*to)(void *e)) {
+    //--
+    char *fto (Kv *kv) { return kv_to_js(kv, to); }
+  return js_wa(arr_map((Arr *)this, (FMAP)fto));
+}
+
+// <char>
+Map *map_from_js(char *js, void *(*from)(char *jse)) {
+    //-- Kv<char>
+    Kv *ffrom (char *kv_js) { return kv_from_js(kv_js, from); }
+  return (Map *)arr_map(js_ra(js), (FMAP)ffrom);
 }

@@ -210,21 +210,13 @@ void exc_throw (char *type, char *message, char *file, char *func, int line) {
 
 char *exc_range(int begin, int end, int index) {
   return str_f(
-    "--- Index out of range: %d out of [%d - %d]", index, begin, end
+    "Index out of range: %d out of [%d - %d]", index, begin, end
   );
 }
 
-char *exc_illegal_argument(char *argument_name, char *expected, char *actual) {
+char *exc_illegal_argument(char *msg, char *expected, char *actual) {
   return str_f(
-    "--- Illegal argument: Variable '%s'\nExpected: %s\n  Actual: %s",
-    argument_name, expected, actual
+    "%s\nExpected: %s\n  Actual: %s",
+    msg, expected, actual
   );
-}
-
-char *exc_illegal_state(char *cause) {
-  return str_f("--- Illegal state: %s", cause);
-}
-
-char *exc_io(char *cause) {
-  return str_f("--- Io error: %s", cause);
 }
