@@ -20,7 +20,7 @@
 ///   pthread_t *thr = thread_start(fn);
 ///   ...
 ///   thread_join(thr); // Waits for thr.
-/// NOTE: After calling 'async_thread' is mandatory to call 'thread_join' to
+/// NOTE: After calling 'thread_start' is mandatory to call 'thread_join' to
 ///         free resources.
 pthread_t *thread_start (void (*fn)(void));
 
@@ -30,7 +30,7 @@ pthread_t *thread_start (void (*fn)(void));
 ///   pthread_t *thr = thread_start2((void(*)(void *))fn, "Hello");
 ///   ...
 ///   thread_join(thr); // Waits for thr.
-/// NOTE: After calling 'thread_start2' is mandatory to call 'async_join' to
+/// NOTE: After calling 'thread_start2' is mandatory to call 'thread_join' to
 ///         free resources.
 pthread_t *thread_start2 (void (*fn)(void *), void *value);
 
@@ -49,7 +49,8 @@ void thread_run2 (void (*fn)(void *), void *value);
 /// Wait until thr finishes.
 void thread_join (pthread_t *thr);
 
-/// Executes 'fn' synchronically.
+/// Executes 'fn' synchronically. It prevents oters threads to access to 'fn'
+/// until it finishes.
 /// Example:
 ///   /**/void fn() { puts("Here"); }
 ///   thread_sync(fn);
@@ -57,12 +58,11 @@ void thread_join (pthread_t *thr);
 ///       'thread_sync2', the program will be blocked.
 void thread_sync (void (*fn)(void));
 
-/// Executes 'fn' synchronically.
+/// Executes 'fn' synchronically. It prevents oters threads to access to 'fn'
+/// until it finishes.
 /// Example:
 ///   /**/void fn(char *tx) { puts(tx); }
 ///   thread_sync2((void(*)(void *))fn, "Hello");
-/// NOTE: if 'fn' call another function which also call 'thread_sync' or
-///       'thread_sync2', the program will be blocked.
 void thread_sync2 (void (*fn)(void *), void *value);
 
 #endif

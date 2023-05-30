@@ -40,9 +40,6 @@ void bytes_add_str(Bytes *this, char *s);
 /// NOTE: Interal zeroes will truncate the string.
 char *bytes_to_str(Bytes *this);
 
-/// Returns 's' as Bytes.
-Bytes *bytes_from_str (char *s);
-
 /// Returns a JSON representation of 'this'.
 char *bytes_to_js(Bytes *this);
 

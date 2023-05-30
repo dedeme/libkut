@@ -7,6 +7,7 @@
 #include "kut/js.h"
 #include "kut/DEFS.h"
 #include "kut/buf.h"
+#include "kut/dec.h"
 
 static void json_unicode(Buf *bf, char *hexdigits) {
   char hexvalue (char ch) {
@@ -158,7 +159,7 @@ int js_rb (char *json) {
   char *j = jsons;
   if (memcmp(j, "true", 4)) {
     if (memcmp(j, "false", 5))
-      EXC_ILLEGAL_ARGUMENT("Bad JSON string", "Boolean value", errorf(j));
+      EXC_ILLEGAL_ARGUMENT("Bad JSON string", "Boolean value", errorf(json));
 
     r = 0;
     j += 5;
@@ -167,7 +168,7 @@ int js_rb (char *json) {
     j += 4;
   }
   if (!json_rend(j))
-    EXC_ILLEGAL_ARGUMENT("Bad JSON string", "Boolean value (spare characters)", errorf(j));
+    EXC_ILLEGAL_ARGUMENT("Bad JSON string", "Boolean value (spare characters)", errorf(json));
 
   return r;
 }
@@ -180,7 +181,7 @@ long js_rl (char *json) {
   char *jsons = json_blanks(json);
   char *j = jsons;
   if (*j != '-' && (*j < '0' || *j > '9'))
-    EXC_ILLEGAL_ARGUMENT("Bad JSON string", "Long value", errorf(j));
+    EXC_ILLEGAL_ARGUMENT("Bad JSON string", "Long value", errorf(json));
 
   Buf *bf = buf_new();
   while (
@@ -191,16 +192,16 @@ long js_rl (char *json) {
   buf_add_buf(bf, jsons, j - jsons);
   char *n = buf_str(bf);
   if (!json_rend(j))
-    EXC_ILLEGAL_ARGUMENT("Bad JSON string", "Long value (spare characters)", errorf(j));
+    EXC_ILLEGAL_ARGUMENT("Bad JSON string", "Long value (spare characters)", errorf(json));
 
   char *tail;
   errno = 0;
   long r = strtol(n, &tail, 10);
   if (errno)
-    EXC_GENERIC(str_f("Bad JSON string: Long overflow in %s", errorf(j)))
+    EXC_GENERIC(str_f("Bad JSON string: Long overflow in %s", errorf(json)));
 
   if (*tail)
-    EXC_ILLEGAL_ARGUMENT("Bad JSON string", "Long value", errorf(j));
+    EXC_ILLEGAL_ARGUMENT("Bad JSON string", "Long value", errorf(json));
 
   return r;
 }
@@ -210,7 +211,7 @@ double js_rd (char *json) {
   char *jsons = json_blanks(json);
   char *j = jsons;
   if (*j != '-' && (*j < '0' || *j > '9'))
-    EXC_ILLEGAL_ARGUMENT("Bad JSON string", "Float value", errorf(j));
+    EXC_ILLEGAL_ARGUMENT("Bad JSON string", "Float value", errorf(json));
 
   Buf *bf = buf_new();
   while (
@@ -225,16 +226,16 @@ double js_rd (char *json) {
     n[ix] = *lc->decimal_point;
   }
   if (!json_rend(j))
-    EXC_ILLEGAL_ARGUMENT("Bad JSON string", "Float value (spare characters)", errorf(j));
+    EXC_ILLEGAL_ARGUMENT("Bad JSON string", "Float value (spare characters)", errorf(json));
 
   errno = 0;
   char *tail;
   double r = strtod(n, &tail);
   if (errno)
-    EXC_GENERIC(str_f("Bad JSON string: Float overflow in %s", errorf(j)))
+    EXC_GENERIC(str_f("Bad JSON string: Float overflow in %s", errorf(json)));
 
   if (*tail)
-    EXC_ILLEGAL_ARGUMENT("Bad JSON string", "Float value", errorf(j));
+    EXC_ILLEGAL_ARGUMENT("Bad JSON string", "Float value", errorf(json));
 
   return r;
 }
@@ -248,7 +249,7 @@ char *js_rs (char *j) {
 
   char *json = json_blanks(j);
   if (*json != '"')
-    EXC_ILLEGAL_ARGUMENT("Bad JSON string", "String value (not begin with '\"')", errorf(json));
+    EXC_ILLEGAL_ARGUMENT("Bad JSON string", "String value (not begin with '\"')", errorf(j));
 
   ++json;
   Buf *bf = buf_new();
@@ -308,7 +309,7 @@ char *js_rs (char *j) {
 Arr *js_ra (char *j) {
   char *json = json_blanks(j);
   if (*json != '[')
-    EXC_ILLEGAL_ARGUMENT("Bad JSON string", "Array value (not begin with '[')", errorf(json));
+    EXC_ILLEGAL_ARGUMENT("Bad JSON string", "Array value (not begin with '[')", errorf(j));
 
   ++json;
   // <char>
@@ -338,7 +339,7 @@ Arr *js_ra (char *j) {
 Map *js_ro (char *j) {
   char *json = json_blanks(j);
   if (*json != '{')
-    EXC_ILLEGAL_ARGUMENT("Bad JSON string", "Object value (not begin with '{')", errorf(json));
+    EXC_ILLEGAL_ARGUMENT("Bad JSON string", "Object value (not begin with '{')", errorf(j));
 
   json = json_blanks(json + 1);
 
@@ -395,12 +396,7 @@ char *js_wl(long n) {
 }
 
 char *js_wf(double n, int scale) {
-  char *tpl = str_f("%%.%df", scale);
-  char *loc = setlocale(LC_ALL, NULL);
-  setlocale(LC_ALL, "C");
-  char *ns = str_f(tpl, n);
-  setlocale(LC_ALL, loc);
-  return ns;
+  return dec_ftos(n, scale);
 }
 
 char *js_ws(char *s) {

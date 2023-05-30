@@ -68,6 +68,9 @@ int time_year (Time this);
 /// Returns week day (0 - 6 => Sunday - Saturday)
 int time_week_day (Time this);
 
+/// Returns the day of year.
+int time_year_day (Time this);
+
 /// Returns hour.
 int time_hour (Time this);
 

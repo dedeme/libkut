@@ -7,12 +7,25 @@
 #include "kut/DEFS.h"
 #include "kut/dec.h"
 
-time_t to_time (Time this) {
+static time_t to_time (Time this) {
   return (time_t)(this / 1000);
 }
 
-Time from_time (time_t tm) {
+static Time from_time (time_t tm) {
   return (Time)tm * 1000;
+}
+
+static int day_light_correction (int day, int month, int year) {
+  struct tm t;
+  memset(&t, 0, sizeof(struct tm));
+  t.tm_year = year - 1900;
+  t.tm_mon = month;
+  t.tm_mday = day;
+  t.tm_hour = 12;
+
+  time_t t2 = mktime(&t);
+  int h = localtime(&t2)->tm_hour;
+  return 12 - h;
 }
 
 Time time_now (void) {
@@ -27,8 +40,7 @@ Time time_new (int day, int month, int year) {
   t.tm_year = year - 1900;
   t.tm_mon = month;
   t.tm_mday = day;
-  t.tm_hour = 12;
-
+  t.tm_hour = 12 + day_light_correction(day, month, year);
   return from_time((time_t) mktime(&t));
 }
 
@@ -40,7 +52,7 @@ Time time_new_time (
   t.tm_year = year - 1900;
   t.tm_mon = month;
   t.tm_mday = day;
-  t.tm_hour = hour;
+  t.tm_hour = hour + day_light_correction(day, month, year);
   t.tm_min = minute;
   t.tm_sec = second;
 
@@ -123,21 +135,29 @@ int time_year (Time this) {
   return localtime(&t)->tm_year + 1900;
 }
 
+int time_year_day (Time this) {
+  time_t t = to_time(this);
+  return localtime(&t)->tm_yday;
+}
+
 int time_week_day (Time this) {
   time_t t = to_time(this);
   return localtime(&t)->tm_wday;
 }
 
 int time_hour (Time this) {
-  return (this / 360000) % 24;
+  time_t t = to_time(this);
+  return localtime(&t)->tm_hour;
 }
 
 int time_minute (Time this) {
-  return (this / 60000) % 60;
+  time_t t = to_time(this);
+  return localtime(&t)->tm_min;
 }
 
 int time_second (Time this) {
-  return (this / 1000) % 60;
+  time_t t = to_time(this);
+  return localtime(&t)->tm_sec;
 }
 
 int time_millisecond (Time this) {
@@ -183,5 +203,5 @@ char *time_to_iso (Time this) {
 }
 
 char *time_to_us (Time this) {
-  return time_f(this, "%m/%d/%Y");
+  return time_f(this, "%m-%d-%Y");
 }

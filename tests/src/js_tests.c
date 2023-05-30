@@ -35,8 +35,16 @@ void js_tests(void) {
   assert(js_rd(" 0.23 ") == 0.23);
   assert(js_ri(" -0 ") == 0);
   assert(js_rd(" -0.0 ") == 0);
+  assert(js_rd("-0.012 ") == -0.012);
   assert(js_rd(" -12.11 ") == -12.11);
   assert(js_rd(" -12.11e22 ") == -12.11e22);
+  assert(js_rd(" -0. ") == 0.0);
+  assert(js_rd(" 3. ") == 3.0);
+  assert(js_rd(" -123. ") == -123.0);
+  assert(js_rd("  1e2 ") == 100.0);
+  assert(js_rd("211e+2") == 21100.0);
+  assert(js_rd("211e-02") == 2.11);
+  assert(js_rd("211e0") == 211.0);
 
 //  js_ri(" 12abc "); // error
 //  js_ri(" 12] "); // error
@@ -53,9 +61,14 @@ void js_tests(void) {
   s = js_wf(0.0, 0);
   assert(js_rd(s) == 0);
   s = js_wf(-0.0, 3);
+  TEST(s, "0");
   assert(js_rd(s) == 0);
   s = js_wf(-.0, 2);
+  TEST(s, "0");
   assert(js_rd(s) == 0);
+  s = js_wf(-0.012, 2);
+  assert(js_rd(s) == -0.01);
+  TEST(s, "-0.01");
   s = js_wf(1.045, 8);
   assert(js_rd(s) == 1.045);
   s = js_wf(-21.045, 3);

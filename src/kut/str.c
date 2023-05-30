@@ -425,8 +425,8 @@ Arr *str_runes(char *s) {
   return r;
 }
 
-// Opt<unsigned>
-Opt *str_to_unicode(char *s0) {
+static unsigned error2 = 65533;
+unsigned *str_to_unicode(char *s0) {
   unsigned char *s = (unsigned char *)s0;
   unsigned b1, b2, b3, b4;
   int lg = str_runes_len(s0) + 1;
@@ -435,38 +435,37 @@ Opt *str_to_unicode(char *s0) {
   while (*s) {
     b1 = *s++;
     if (b1 < 0x80) *pr++ = b1;
-    else if (b1 < 0xC2) return opt_none();
+    else if (b1 < 0xC2) *pr++ = error2;
     else if (b1 < 0xE0) {
       b2 = *s++;
-      if ((b2 & 0xC0) != 0x80) return opt_none();
+      if ((b2 & 0xC0) != 0x80) *pr++ = error2;
       *pr++ = (b1 << 6) + b2 - 0x3080;
     } else if (b1 < 0xF0) {
       b2 = *s++;
-      if ((b2 & 0xC0) != 0x80) return opt_none();
-      if (b1 == 0xE0 && b2 < 0xA0) return opt_none();
+      if ((b2 & 0xC0) != 0x80) *pr++ = error2;
+      if (b1 == 0xE0 && b2 < 0xA0) *pr++ = error2;
       b3 = *s++;
-      if ((b3 & 0xC0) != 0x80) return opt_none();
+      if ((b3 & 0xC0) != 0x80) *pr++ = error2;
       *pr++ = (b1 << 12) + (b2 << 6) + b3 - 0xE2080;
     } else if (b1 < 0xF5) {
       b2 = *s++;
-      if ((b2 & 0xC0) != 0x80) return opt_none();
-      if (b1 == 0xF0 && b2 < 0x90) return opt_none();
-      if (b1 == 0xF4 && b2 >= 0x90) return opt_none();
+      if ((b2 & 0xC0) != 0x80) *pr++ = error2;
+      if (b1 == 0xF0 && b2 < 0x90) *pr++ = error2;
+      if (b1 == 0xF4 && b2 >= 0x90) *pr++ = error2;
       b3 = *s++;
-      if ((b3 & 0xC0) != 0x80) return opt_none();
+      if ((b3 & 0xC0) != 0x80) *pr++ = error2;
       b4 = *s++;
-      if ((b4 & 0xC0) != 0x80) return opt_none();
+      if ((b4 & 0xC0) != 0x80) *pr++ = error2;
       *pr++ = (b1 << 18) + (b2 << 12) + (b3 << 6) + b4 - 0x3C82080;
     } else {
-      return opt_none();
+      *pr++ = error2;
     }
   }
   *pr = 0;
-  return opt_some(r);
+  return r;
 }
 
-// Opt<char>
-Opt *str_from_unicode(unsigned *u) {
+char *str_from_unicode(unsigned *u) {
   Buf *bf = buf_new();
 
   while (*u) {
@@ -486,11 +485,11 @@ Opt *str_from_unicode(unsigned *u) {
       buf_cadd(bf, (unsigned char)((code_point >> 6) & 0x3F) + 0x80);
       buf_cadd(bf, (unsigned char)(code_point & 0x3F) + 0x80);
     } else {
-      return opt_none();
+      buf_add(bf, replace_error);
     }
   }
 
-  return opt_some(str_new(buf_str(bf)));
+  return str_new(buf_str(bf));
 }
 
 char *str_from_iso(char *s) {
@@ -509,33 +508,25 @@ char *str_from_iso(char *s) {
 }
 
 char *str_to_upper (char *s) {
-  unsigned *ws = (unsigned *)opt_get(str_to_unicode(s));
-  if (!ws) EXC_ILLEGAL_ARGUMENT("Bad string", "Valid utf8 string", "Wrong value");
-
+  unsigned *ws = str_to_unicode(s);
   unsigned *p = ws;
   while (*p) {
     *p = (unsigned)towupper(*p);
     ++p;
   }
 
-  char *r = (char *)opt_get(str_from_unicode(ws));
-  if (!r) EXC_ILLEGAL_ARGUMENT("Interal error", "Valid Unicode wchar", "Wrong value");
-  return r;
+  return str_from_unicode(ws);
 }
 
 char *str_to_lower (char *s) {
-  unsigned *ws = (unsigned *)opt_get(str_to_unicode(s));
-  if (!ws) EXC_ILLEGAL_ARGUMENT("Bad string", "Valid utf8 string", "Wrong value");
-
+  unsigned *ws = str_to_unicode(s);
   unsigned *p = ws;
   while (*p) {
     *p = (unsigned)towlower(*p);
     ++p;
   }
 
-  char *r = (char *)opt_get(str_from_unicode(ws));
-  if (!r) EXC_ILLEGAL_ARGUMENT("Internal error", "Valid Unicode wchar", "Wrong value");
-  return r;
+  return str_from_unicode(ws);
 }
 
 char *str_to_escape (char *s) {

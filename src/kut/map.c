@@ -13,6 +13,30 @@ int map_size(Map *this) {
   return arr_size((Arr *)this);
 }
 
+void map_add(Map *this, char *key, void *value) {
+  if (map_has_key(this, key))
+    EXC_ILLEGAL_ARGUMENT(
+      str_f("Fail adding the key '%s'", key),
+      "A new key",
+      "Key is duplicate"
+    );
+  arr_push((Arr *)this, kv_new(key, value));
+}
+
+void map_set(Map *this, char *key, void *value) {
+  EACH((Arr *)this, Kv, kv) {
+    if (!strcmp(kv_key(kv), key)) {
+      arr_set((Arr *)this, _i, kv_new(key, value));
+      return;
+    }
+  }_EACH
+  EXC_ILLEGAL_ARGUMENT(
+    str_f("Fail changing the value of key '%s'", key),
+    "Key already existing",
+    "Key does not exist"
+  );
+}
+
 void map_put(Map *this, char *key, void *value) {
   int todo = TRUE;
   EACH((Arr *)this, Kv, kv) {
@@ -98,16 +122,15 @@ void map_sort_locale(Map *this) {
   arr_sort((Arr *)this, (FEQ)greater);
 }
 
-// this is Map<char>
 char *map_to_js(Map *this, char *(*to)(void *e)) {
-    //--
-    char *fto (Kv *kv) { return kv_to_js(kv, to); }
-  return js_wa(arr_map((Arr *)this, (FMAP)fto));
+    //-- <char>
+    Kv *fto (Kv *kv) { return kv_new(kv_key(kv), to(kv_value(kv))); }
+  return js_wo((Map *)arr_map((Arr *)this, (FMAP)fto));
 }
 
 // <char>
 Map *map_from_js(char *js, void *(*from)(char *jse)) {
-    //-- Kv<char>
-    Kv *ffrom (char *kv_js) { return kv_from_js(kv_js, from); }
-  return (Map *)arr_map(js_ra(js), (FMAP)ffrom);
+    //-- kv is Kv<char>
+    Kv *ffrom (Kv *kv) { return kv_new(kv_key(kv), from(kv_value(kv))); }
+  return (Map *)arr_map((Arr *)js_ro(js), (FMAP)ffrom);
 }

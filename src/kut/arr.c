@@ -15,7 +15,7 @@ struct arr_Arr {
   void **endbf; // End buffer.
 };
 
-Arr *arr_new () {
+Arr *arr_new (void) {
   return arr_new_bf(15);
 }
 
@@ -257,8 +257,8 @@ void arr_sort (Arr *this, int (*greater)(void *, void *)) {
     }
     int mid1 = size / 2;
     int mid2 = size - mid1;
-    void **a1 = ATOMIC(mid1 * sizeof(void *));
-    void **a2 = ATOMIC(mid2 * sizeof(void *));
+    void **a1 = GC_MALLOC(mid1 * sizeof(void *));
+    void **a2 = GC_MALLOC(mid2 * sizeof(void *));
     void **pa = a;
     void **pa1 = a1;
     void **pa2 = a2;
@@ -315,8 +315,8 @@ void arr_shuffle (Arr *this) {
   while (p > es) {
     pix = es + rnd_i(size--);
     tmp = *p;
-    *p-- = *(pix);
-    *(pix) = tmp;
+    *p-- = *pix;
+    *pix = tmp;
   }
 }
 
@@ -470,6 +470,12 @@ Arr *arr_map2 (Arr *this, void *(*conv1)(void *e), void *(*conv2)(void *e)) {
   if (p < end) arr_push(r, conv1(*p++));
   while (p < end) arr_push(r, conv2(*p++));
   return r;
+}
+
+void *arr_reduce(Arr *this, void *seed, void *(*fn)(void *seed, void *elem)) {
+  void **p = this->es;
+  while (p < this->end) seed = fn(seed, *p++);
+  return seed;
 }
 
 Arr *arr_zip (Arr *a1, Arr *a2, void *(*converter)(void *e1, void *e2)) {

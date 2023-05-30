@@ -11,6 +11,8 @@ void path_tests(void) {
 
   TEST(path_cat("a", "b", NULL), "a/b");
   TEST(path_cat("a", "b", "c", NULL), "a/b/c");
+  TEST(path_cat("a", "", NULL), "a/");
+  TEST(path_cat("", "b", "", NULL), "b/");
 
   TEST(path_base(""), "");
   TEST(path_base("/"), "");
@@ -19,10 +21,10 @@ void path_tests(void) {
   TEST(path_base("cd/"), "cd");
   TEST(path_base("c/ab.c"), "ab.c");
 
-  TEST(path_parent(""), "");
-  TEST(path_parent("/"), "");
+  TEST(path_cat(path_parent("a/b/"), path_base("a/b/"), NULL), "a/b");
+
   TEST(path_parent("ab"), "");
-  TEST(path_parent("/ab.c"), "");
+  TEST(path_parent("/ab.c"), "/");
   TEST(path_parent("cd/"), "");
   TEST(path_parent("cg/r/ab.c"), "cg/r");
 
@@ -34,6 +36,12 @@ void path_tests(void) {
   TEST(path_extension("cd/ab.c"), ".c");
   TEST(path_extension("cd/."), ".");
   TEST(path_extension("cd/f."), ".");
+
+  TEST(path_clean(""), "");
+  TEST(path_clean("/"), "/");
+  TEST(path_clean("ab/.."), "");
+  TEST(path_clean("ab/../ds/"), "ds");
+  TEST(path_clean("/etc/apt/.//..//../etc"), "/etc");
 
   assert(!opt_get(path_canonical("/hom/dem")));
   assert(!opt_get(path_canonical("/bin/xx/.//..//../bin")));

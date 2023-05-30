@@ -15,9 +15,15 @@ char *dec_ftos (double n, int scale) {
   char *tpl = str_f("%%.%df", scale);
   char *loc = setlocale(LC_ALL, NULL);
   setlocale(LC_ALL, "C");
-  char *ns = str_f(tpl, n);
+  char *ns = str_f(tpl, n + (n >= 0 ? 0.000000000001 : -0.000000000001));
   setlocale(LC_ALL, loc);
-  if (str_starts(ns, "-0")) ns = str_right(ns, 1);
+  if (scale > 0) {
+    char *p = ns + strlen(ns) - 1;
+    while (*p == '0') --p;
+    if (*p != '.') ++p;
+    ns = str_left(ns, p - ns);
+  }
+  if (!strcmp(ns, "-0")) ns = "0";
   return ns;
 }
 
@@ -28,12 +34,12 @@ int dec_stoi (char *s) {
 long dec_stol (char *s) {
   s = str_trim(s);
   if (!*s)
-    EXC_ILLEGAL_ARGUMENT("Bad number", "An integer", "A empty string")
+    EXC_ILLEGAL_ARGUMENT("Bad number", "An integer", "A empty string");
 
   char *tmp;
   long r = strtol(s, &tmp, 0);
   if (*tmp)
-    EXC_ILLEGAL_ARGUMENT("Bad number", "A valid number", s)
+    EXC_ILLEGAL_ARGUMENT("Bad number", "A valid number", s);
 
   return r;
 }
@@ -45,13 +51,16 @@ float dec_stof (char *s) {
 double dec_stod (char *s) {
   s = str_trim(s);
   if (!*s)
-    EXC_ILLEGAL_ARGUMENT("Bad number", "A double", "A empty string")
+    EXC_ILLEGAL_ARGUMENT("Bad number", "A double", "A empty string");
 
-  if (str_starts(s, "-0")) s = str_right(s, 1);
+  struct lconv *lc = localeconv();
+  int ix = str_cindex(s, '.');
+  if (ix != -1) s[ix] = *lc->decimal_point;
+
   char *tmp;
   double r = strtod(s, &tmp);
   if (*tmp)
-    EXC_ILLEGAL_ARGUMENT("Bad number", "A valid number", s)
+    EXC_ILLEGAL_ARGUMENT("Bad number", "A valid number", s);
 
   return r;
 }
@@ -98,7 +107,7 @@ double dec_round (double n, int scale) {
 }
 
 int dec_eq (double n1, double n2) {
-  return dec_eq_gap(n1, n2, 0.000001);
+  return dec_eq_gap(n1, n2, 0.0000001);
 }
 
 int dec_eq_gap (double n1, double n2, double gap) {

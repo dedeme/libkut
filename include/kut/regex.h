@@ -11,7 +11,7 @@
 /// Type of regular expresion results.
 /// Every offset is a pair of ints [begin-end] , where 'begin' is the start
 /// of the string offset inclusive, and 'end' the end point exclusive.
-typedef struct regex_RegexOffet RegexOffset;
+typedef struct regex_RegexOffset RegexOffset;
 
 /// Returns the offset begin.
 int regexOffset_begin (RegexOffset *off);
@@ -42,5 +42,12 @@ Opt *regex_replace (char *rex, char *s, char *replacement);
 
 /// Equals to regex_replace, but "ignoring case".
 Opt *regex_replace_ic (char *rex, char *s, char *replacement);
+
+/// Equals to reges_replace but using a function to generate the replacement.
+///   rex         : Regular expression to replace. It does not admit grouping
+///                 (that is, parenthesis).
+///   s           : String to search in.
+///   freplacement: Function to calculate a replacement from each match found.
+Opt *regex_replacef (char *rex, char *s, char *(*freplacement)(char *match));
 
 #endif

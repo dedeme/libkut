@@ -149,11 +149,11 @@ char *str_next_rune(char **rune, char *s);
 ///   arr_join(str_runes(s), "") == s
 Arr *str_runes(char *s);
 
-/// Codifies a string to 'Unicode wchar'. Returns an Opt<unicode>.
-Opt *str_to_unicode(char *s);
+/// Codifies a string to 'Utf-16'.
+unsigned *str_to_unicode(char *s);
 
-/// Decodifies a string from 'Unicode wchar'. Returns an Opt<char>.
-Opt *str_from_unicode(unsigned *u);
+/// Decodifies a string from 'utf-16'.
+char *str_from_unicode(unsigned *u);
 
 /// Decodifies a string from ISO-8859-1.
 char *str_from_iso(char *s);

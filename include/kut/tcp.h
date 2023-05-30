@@ -119,26 +119,25 @@ typedef struct tcp_TcpServer TcpServer;
 /// Connection structure.
 typedef struct tcp_TcpConn TcpConn;
 
-/// Returns a server connected to 'port'.
+/// Returns a server connected to 'port'. Server admits a maximum of 'conns'
+/// connections simultaneously.
 /// Throw EXC_IO.
-TcpServer *tcp_server (int port);
+TcpServer *tcp_server (int port, int conns);
 
 /// Returns a Rs<TcpConn>. A client connection.
 Rs *tcp_accept (TcpServer *sv);
 
-/// Read a client connection in a Rs<char>.
-Rs *tcp_read (TcpConn *conn);
-
 /// Read a client connection in a Rs<Bytes>.
-Rs *tcp_read_bin (TcpConn *conn);
-
-/// Write a text in 'conn', returning "" if there no was any error, or an
-/// error message oterwise.
-char *tcp_write (TcpConn *conn, char *s);
+/// Usually if bytes.size(rs.get()) is 0, it means that the other part has
+/// closed the connection.
+///   conn   : Connection to read.
+///   len    : Maximun length of bytes to read.
+///   seconds: Maximum waiting time.
+Rs *tcp_read (TcpConn *conn, int len, int seconds);
 
 /// Write 'bs' in 'conn', returning "" if there no was any error, or an
 /// error message oterwise.
-char *tcp_write_bin (TcpConn *conn, Bytes *bs);
+char *tcp_write (TcpConn *conn, Bytes *bs);
 
 /// Returns a Rs<TcpConn> with a client connection to a server 'sv' in the
 /// port 'port'.

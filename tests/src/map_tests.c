@@ -17,9 +17,9 @@ void map_tests(void) {
   map_put(m, "uno", "2");
   TESTI(map_size(m), 1);
   TEST(opt_get(map_get(m, "uno")), "2");
-  map_put(m, "dos", "2");
+  map_add(m, "dos", "2");
   TEST(opt_get(map_get(m, "dos")), "2");
-  map_put(m, "uno", str_new("1"));
+  map_set(m, "uno", str_new("1"));
   TEST(opt_get(map_get(m, "uno")), "1");
   TESTI(map_size(m), 2);
   assert(!opt_get(map_get(m, "tres")));
@@ -69,7 +69,7 @@ void map_tests(void) {
 
   TESTI(map_size(
     map_from_js(map_to_js(map_new(), (FTO)js_ws), (FFROM)js_rs)), 0);
-  // <char>
+
   Map *m2 = map_from_js(map_to_js(m, (FTO)js_ws), (FFROM)js_rs);
   TEST(opt_get(map_get(m2, "uno")), "1");
   TEST(opt_get(map_get(m2, "él")), "2");

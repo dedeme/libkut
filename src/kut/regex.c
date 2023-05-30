@@ -6,7 +6,7 @@
 #include "kut/DEFS.h"
 #include "kut/buf.h"
 
-struct regex_RegexOffet {
+struct regex_RegexOffset {
   int begin;
   int end;
 };
@@ -61,7 +61,7 @@ Opt *regex_matches (char *rex, char *s) {
     EXC_ILLEGAL_ARGUMENT("Bad regular expresion", "An expresion", "An empty string");
 
   regex_t exp;
-  if (regcomp(&exp, rex, 0)) return opt_none();
+  if (regcomp(&exp, rex, REG_EXTENDED)) return opt_none();
   return opt_some(matches(&exp, s));
 }
 
@@ -71,7 +71,7 @@ Opt *regex_matches_ic (char *rex, char *s) {
     EXC_ILLEGAL_ARGUMENT("Bad regular expresion", "An expresion", "An empty string");
 
   regex_t exp;
-  if (regcomp(&exp, rex, REG_ICASE)) return opt_none();
+  if (regcomp(&exp, rex, REG_EXTENDED | REG_ICASE)) return opt_none();
   return opt_some(matches(&exp, s));
 }
 
@@ -101,5 +101,25 @@ Opt *regex_replace_ic (char *rex, char *s, char *replacement) {
   // <RegexOffset>
   Arr *matches = opt_get(regex_matches_ic(rex, s));
   if (matches) return opt_some(replace(matches, s, replacement));
+  return opt_none();
+}
+
+// matches is Arr<RegexOffset>
+static char *replacef (Arr *matches, char *s, char *(*frepl)(char *match)) {
+  Buf *bf = buf_new();
+  int ix = 0;
+  EACH(matches, RegexOffset, rg) {
+    buf_add(bf, str_sub(s, ix, rg->begin));
+    buf_add(bf, frepl(str_sub(s, rg->begin, rg->end)));
+    ix = rg->end;
+  }_EACH
+  buf_add(bf, str_right(s, ix));
+  return str_new(buf_str(bf));
+}
+
+Opt *regex_replacef (char *rex, char *s, char *(*freplacement)(char *match)) {
+  // <RegexOffset>
+  Arr *matches = opt_get(regex_matches(rex, s));
+  if (matches) return opt_some(replacef(matches, s, freplacement));
   return opt_none();
 }

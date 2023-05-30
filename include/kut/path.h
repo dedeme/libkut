@@ -17,13 +17,18 @@ char *path_cat (char *name1, char *name2, ...);
 char *path_base (char *path);
 
 /// Returns the parent path of 'path' after removing all trailing '/'.
-/// If 'path' is "/" or a string without '/', it returns an empty string.
+/// If 'path' is a string without '/', it returns an empty string.
+/// If path is root or an empty string, it throws an exception.
 char *path_parent (char *path);
 
 /// Returns only extension of 'path_base(path)'. Extension is returned with point,
 /// (e.g., ".", ".txt").
 /// If path does not have extension it returns "".
 char *path_extension (char *path);
+
+/// Removes duplicates '/' and redundant '..'.
+/// The returns ends in a slash only if it is the root "/".
+char *path_clean (char *s);
 
 /// Returns Opt<char> Cannonical representation of 'path'.
 ///   - If some component of 'path' is not in file system, returns 'opt_none'.

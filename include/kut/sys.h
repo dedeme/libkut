@@ -48,7 +48,11 @@ char *sys_user_home(void);
 /// Executes 'command' and returns a Rs<char> with values: [stderr - stdout].
 /// If the command can not be exectued returns the stderr message
 /// "NOEXEC: <cmd>", where 'cmd' is 'command'.
-
 Rs *sys_cmd(char *command);
+
+/// Reads a line from console.
+/// The trailing '\n' is not read.
+/// Inputs using [Control] casts unpredicted results.
+char *sys_read_line (void);
 
 #endif

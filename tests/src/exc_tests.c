@@ -9,7 +9,7 @@ void fn(void) {
   int v = -1;
   TRY
     v = 0;
-    THROW(exc_generic_t, "Value is %d", v);
+    THROW(exc_generic_t, str_f("Value is %d", v));
     v = 1;
   CATCH(e)
     TESTI(v, 0);
@@ -26,7 +26,7 @@ char *fn2(void) {
   int v = -1;
   TRY
     v = 0;
-    THROW(exc_generic_t, "Value is %d", v);
+    THROW(exc_generic_t, str_f("Value is %d", v));
     v = 1;
   CATCH(e)
     TESTI(v, 0);
@@ -41,6 +41,18 @@ char *fn2(void) {
   return "ok2";
 }
 
+void fn_b0(void) {
+  THROW(exc_io_t, "FAIL fn0");
+}
+
+void fn_b1(void) {
+  TRY {
+    fn_b0();
+  } CATCH (e) {
+    THROW(exc_generic_t, str_right(exc_msg(e), -3));
+  }_TRY
+}
+
 void exc_tests(void) {
   puts(">>> exc:");
 
@@ -52,6 +64,12 @@ void exc_tests(void) {
   CATCH (e)
     TEST(exc_msg(e), "ok2");
   _TRY
+
+  TRY {
+    fn_b1();
+  } CATCH (e) {
+    TEST(exc_type(e), exc_generic_t);
+  } _TRY
 
   puts("... Finished");
 }

@@ -15,22 +15,24 @@ void dec_tests(void) {
 
   TEST(dec_ftos(-3425.0, 0), "-3425");
   TEST(dec_ftos(-3425.23, 0), "-3425");
-  TEST(dec_ftos(-3425.0, 2), "-3425.00");
+  TEST(dec_ftos(-3425.0, 2), "-3425");
   TEST(dec_ftos(-3425.23, 2), "-3425.23");
-  TEST(dec_ftos(-3425.0, 5), "-3425.00000");
-  TEST(dec_ftos(-3425.23, 5), "-3425.23000");
+  TEST(dec_ftos(-3425.0, 5), "-3425");
+  TEST(dec_ftos(-3425.23, 5), "-3425.23");
   TEST(dec_ftos(0.0, 0), "0");
   TEST(dec_ftos(0.23, 0), "0");
-  TEST(dec_ftos(-0.0, 2), "0.00");
-  TEST(dec_ftos(-0.23, 2), "0.23");
-  TEST(dec_ftos(0, 5), "0.00000");
-  TEST(dec_ftos(0.23, 5), "0.23000");
+  TEST(dec_ftos(-0.0, 2), "0");
+  TEST(dec_ftos(-0.23, 2), "-0.23");
+  TEST(dec_ftos(0, 5), "0");
+  TEST(dec_ftos(0.23, 5), "0.23");
   TEST(dec_ftos(3425.0, 0), "3425");
   TEST(dec_ftos(3425.23, 0), "3425");
-  TEST(dec_ftos(3425.0, 2), "3425.00");
+  TEST(dec_ftos(3425.0, 2), "3425");
   TEST(dec_ftos(3425.23, 2), "3425.23");
-  TEST(dec_ftos(3425.0, 5), "3425.00000");
-  TEST(dec_ftos(3425.23, 5), "3425.23000");
+  TEST(dec_ftos(3425.0, 5), "3425");
+  TEST(dec_ftos(3425.23, 5), "3425.23");
+  TEST(dec_ftos(3000.0, 0), "3000");
+  TEST(dec_ftos(1235.0e-2, 1), "12.4");
 
   sys_set_locale("es_ES.utf8");
   TEST(dec_to_locale(-3425.0, 0), "-3.425");
@@ -58,23 +60,27 @@ void dec_tests(void) {
   TESTI(dec_stoi("25"), 25);
   TESTI(dec_stoi("+25"), 25);
 
+  TESTI(dec_stoi("0XF"), 15);
+  TESTI(dec_stoi("0Xff"), 255);
+  TESTI(dec_stoi("0XfFfF"), 65535);
+
   TESTF(dec_stod("-3425"), -3425);
   TESTF(dec_stod("-3425.23"), -3425.23);
-  TESTF(dec_stod("-0"), 0);
+  assert(dec_eq(dec_stod("-0"), 0));
   TESTF(dec_stod("0.23"), 0.23);
   TESTF(dec_stod("+3425"), 3425);
-  TESTF(dec_stod("3425.23"), 3425.23);
+  TESTF(dec_stod("3425.2300"), 3425.23);
 
   TESTF(dec_from_en("-3,425"), -3425);
   TESTF(dec_from_en("-3425.23"), -3425.23);
-  TESTF(dec_from_en("-0"), 0);
+  assert(dec_eq(dec_from_en("-0"), 0));
   TESTF(dec_from_en("0.23"), 0.23);
   TESTF(dec_from_en("+3425"), 3425);
   TESTF(dec_from_en("3,425.23"), 3425.23);
 
   TESTF(dec_from_iso("-3.425"), -3425);
   TESTF(dec_from_iso("-3425,23"), -3425.23);
-  TESTF(dec_from_iso("-0"), 0);
+  assert(dec_eq(dec_from_iso("-0"), 0));
   TESTF(dec_from_iso("0,23"), 0.23);
   TESTF(dec_from_iso("+3425"), 3425);
   TESTF(dec_from_iso("3.425,23"), 3425.23);

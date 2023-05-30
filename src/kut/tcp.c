@@ -2,12 +2,14 @@
 // GNU General Public License - V3 <http://www.gnu.org/licenses/>
 
 #include <errno.h>
+#include <signal.h>
 #include <netdb.h>
 #include <arpa/inet.h>
 #include <sys/socket.h>
 #include <netinet/in.h>
 #include <unistd.h>
 #include <stdio.h>
+#include <fcntl.h>
 #include "kut/tcp.h"
 #include "kut/DEFS.h"
 
@@ -19,22 +21,22 @@ struct tcp_TcpConn {
   int id;
 };
 
-TcpServer *tcp_server (int port) {
+TcpServer *tcp_server (int port, int conns) {
   TcpServer *this = MALLOC(TcpServer);
 
   struct sockaddr_in server;
   int id = socket(AF_INET , SOCK_STREAM , 0);
-	if (id == -1)
+  if (id == -1)
     EXC_IO("Could not create socket");
 
-	server.sin_family = AF_INET;
-	server.sin_addr.s_addr = INADDR_ANY;
-	server.sin_port = htons(port);
+  server.sin_family = AF_INET;
+  server.sin_addr.s_addr = INADDR_ANY;
+  server.sin_port = htons(port);
 
-	if(bind(id,(struct sockaddr *)&server , sizeof(server)) < 0)
-		EXC_IO("bind failed. Error");
+  if(bind(id,(struct sockaddr *)&server , sizeof(server)) < 0)
+    EXC_IO("bind failed. Error");
 
-	listen(id, 3);
+  listen(id, conns);
 
   this->id = id;
   return this;
@@ -45,48 +47,69 @@ Rs *tcp_accept (TcpServer *sv) {
   TcpConn *r = MALLOC(TcpConn);
 
   struct sockaddr_in client;
-	int c = sizeof(struct sockaddr_in);
-	int id = accept(sv->id, (struct sockaddr *)&client, (socklen_t*)&c);
-	if (id < 0)
+  int c = sizeof(struct sockaddr_in);
+  int id = accept(sv->id, (struct sockaddr *)&client, (socklen_t*)&c);
+  if (id < 0)
     return rs_fail("accept failed");
 
   r->id = id;
   return rs_ok(r);
 }
 
-// <char>
-Rs *tcp_read (TcpConn *conn) {
-  // <Bytes>
-  Rs *bs_rs = tcp_read_bin(conn);
-  Bytes *bs = rs_get(bs_rs);
-  if (!bs) return bs_rs;
-  return rs_ok(bytes_to_str(bs));
-}
-
 // <Bytes>
-Rs *tcp_read_bin (TcpConn *conn) {
-  Bytes *r = bytes_new();
-  int buffer = 8192;
-  unsigned char bs[buffer];
-  int len;
-  if ((len = (int)recv(conn->id, bs, buffer, 0)) > 0)
-    bytes_add_bytes(r, bs, len);
+Rs *tcp_read (TcpConn *conn, int len, int seconds) {
+  fd_set set;
+  struct timeval timeout;
+  FD_ZERO (&set);
+  FD_SET (conn->id, &set);
+  timeout.tv_sec = seconds;
+  timeout.tv_usec = 0;
 
-  if (len == -1) {
-    close(conn->id);
-    return rs_fail(str_f("Fail reading on connection: %s", strerror(errno)));
+  int rsel;
+  for (;;) {
+    rsel = select (FD_SETSIZE, &set, NULL, NULL, &timeout);
+    if (rsel < 0 && errno == EINTR) continue;
+    break;
   }
+  if (rsel < 0)
+    return rs_fail(str_f(
+      "Fail reading on connection (select): %s", strerror(errno)
+    ));
+  if (rsel == 0)
+    return rs_fail("Time out");
 
+  unsigned char bs[len + 1];
+  int rlen;
+  for (;;) {
+    rlen = (int)recv(conn->id, bs, len + 1, 0);
+    if (rlen < 0 && errno == EINTR) continue;
+    break;
+  }
+  if (rlen < 0) {
+    close(conn->id);
+    return rs_fail(str_f(
+      "Fail reading on connection (recv): %s", strerror(errno)
+    ));
+  }
+  if (rlen > len)
+    return rs_fail("Connection overflow");
+
+  Bytes *r = bytes_new();
+  bytes_add_bytes(r, bs, rlen);
   return rs_ok(r);
 }
 
-char *tcp_write (TcpConn *conn, char *s) {
-  return tcp_write_bin(conn, bytes_from_str(s));
-}
-
-char *tcp_write_bin (TcpConn *conn, Bytes *bs) {
-  if (send(conn->id, bytes_bs(bs), bytes_len(bs), 0) == -1)
-     return str_f("Fail sending on connection: %s", strerror(errno));
+char *tcp_write (TcpConn *conn, Bytes *bs) {
+  int rs;
+  for (;;) {
+    rs = send(conn->id, bytes_bs(bs), bytes_len(bs), 0);
+    if (rs == 1 && errno == EINTR) continue;
+    break;
+  }
+  if (rs == 1) {
+    close(conn->id);
+    return str_f("Fail sending on connection: %s", strerror(errno));
+  }
   fsync(conn->id);
   return "";
 }
@@ -95,19 +118,22 @@ char *tcp_write_bin (TcpConn *conn, Bytes *bs) {
 Rs *tcp_dial (char *sv, int port) {
   struct sockaddr_in server;
   int id = socket(AF_INET , SOCK_STREAM , 0);
-	if (id == -1)
+  if (id == -1) return rs_fail("Could not create socket");
+  int oldflags = fcntl (id, F_GETFL, 0);
+  if (oldflags == -1) return rs_fail("Could not create socket");
+  if (fcntl (id, F_SETFL, oldflags) == -1)
     return rs_fail("Could not create socket");
 
-	server.sin_family = AF_INET;
-	server.sin_port = htons(port);
-	if (!inet_aton(sv, &server.sin_addr)) {
+  server.sin_family = AF_INET;
+  server.sin_port = htons(port);
+  if (!inet_aton(sv, &server.sin_addr)) {
     struct hostent *he;
     if ((he = gethostbyname(sv)) == NULL)
       return rs_fail(str_f("Host '%s' not found", sv));
     server.sin_addr = *(struct in_addr *) he->h_addr;
   }
 
-	if (connect(id , (struct sockaddr *)&server , sizeof(server)) < 0)
+  if (connect(id , (struct sockaddr *)&server , sizeof(server)) < 0)
     return rs_fail(str_f("Fail connection with '%s'", sv));
 
   TcpConn *r = MALLOC(TcpConn);

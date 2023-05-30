@@ -3,6 +3,7 @@
 
 #include "kut/thread.h"
 #include "kut/DEFS.h"
+#include <unistd.h>
 
 static pthread_mutex_t thread_mutex;
 static pthread_t *thread_in = NULL;
@@ -18,7 +19,6 @@ static struct thread_Thread *thread_thread_new (
   struct thread_Thread *this = MALLOC(struct thread_Thread);
   this->fn = fn;
   this->value = value;
-  exc_thread_end();
   return this;
 }
 
@@ -88,7 +88,16 @@ void thread_sync (void (*fn)(void)) {
 }
 
 void thread_sync2 (void (*fn)(void *), void *value) {
+  pthread_t self = pthread_self();
+  if (thread_in && pthread_equal(self, *thread_in)) {
+    fn(value);
+    return;
+  }
+
   pthread_mutex_lock(&thread_mutex);
+  thread_in = MALLOC(pthread_t);
+  *thread_in = self;
   fn(value);
+  thread_in = NULL;
   pthread_mutex_unlock(&thread_mutex);
 }

@@ -53,6 +53,9 @@ char *js_wi(int n);
 char *js_wl(long n);
 
 /// Write a double value.
+///   n    : Number to serialize.
+///   scale: Number of decimal positions. Its value is forced between
+///          0 and 9, both inclusive.
 char *js_wf(double n, int scale);
 
 /// Write a string.

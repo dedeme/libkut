@@ -14,7 +14,7 @@ typedef struct it_It It;
 typedef struct arr_Arr Arr;
 
 /// Creates an empty array.
-Arr *arr_new ();
+Arr *arr_new (void);
 
 /// Creates an empty array with a defined initial buffer.
 Arr *arr_new_bf (int buffer);
@@ -172,6 +172,15 @@ Arr *arr_map (Arr *this, void *(*converter)(void *e));
 /// the old first one and the rest by apply conv2.
 /// 'conv1' and 'conv2' can be cast to FMAP
 Arr *arr_map2 (Arr *this, void *(*conv1)(void *e), void *(*conv2)(void *e));
+
+/// Returns the result of calculate 'seed = fn(seed, e)' with every element
+/// of 'this'.
+/// For example:
+///   Arr *a = arr_new_from("a", "b", "c", NULL);
+///   char *fn (char *r, char *e) { return str_f("%s%s", r, e); }
+///   char *r = arr_reduce(a, "-", (void *(*)(void *, void *))fn);
+///   // r == "-abc"
+void *arr_reduce(Arr *this, void *seed, void *(*fn)(void *seed, void *elem));
 
 /// Returns a new Arr mixing values of 'a1' and 'a2' produced by successively
 /// apply 'converter' to their elements. The size of the resultant

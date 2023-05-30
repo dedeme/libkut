@@ -20,23 +20,16 @@ char *path_cat (char *name1, char *name2, ...) {
   if (!name1 || !name2)
     EXC_GENERIC("'path_cat' requieres at least 2 arguments.");
 
-  if (!*name1 || !*name2)
-    EXC_GENERIC("'path_cat' requieres not empty strings.");
-
   Buf *bf = buf_new();
   buf_add(bf, name1);
-  buf_cadd(bf, '/');
+  if (*buf_str(bf)) buf_cadd(bf, '/');
   buf_add(bf, name2);
 
   va_start(args, name2);
   tmp = va_arg(args, char *);
   while (tmp) {
-    if (*tmp) {
-      buf_cadd(bf, '/');
-      buf_add(bf, tmp);
-    } else {
-      EXC_GENERIC("'path_cat' requieres not empty strings.");
-    }
+    if (*buf_str(bf)) buf_cadd(bf, '/');
+    buf_add(bf, tmp);
     tmp = va_arg(args, char *);
   }
   va_end(args);
@@ -47,19 +40,17 @@ char *path_cat (char *name1, char *name2, ...) {
 char *path_base (char *path) {
   path = normalize(path);
   int ix = str_last_cindex(path, '/');
-  if (ix != -1) {
-    return str_right(path, ix + 1);
-  }
+  if (ix != -1) return str_right(path, ix + 1);
   return path;
 }
 
 char *path_parent (char *path) {
-  path = normalize(path);
-  int ix = str_last_cindex(path, '/');
-  if (ix == -1) {
-    ix = 0;
-  }
-  return str_left(path, ix);
+  char *s = normalize(path);
+  if (!*s) EXC_GENERIC(str_f("'%s' has not parent directory", path));
+  int ix = str_last_cindex(s, '/');
+  if (ix == -1) return "";
+  if (ix == 0) return "/";
+  return str_left(s, ix);
 }
 
 char *path_extension (char *path) {
@@ -69,6 +60,43 @@ char *path_extension (char *path) {
     ix = str_len(path);
   }
   return str_right(path, ix);
+}
+
+char *path_clean (char *path) {
+  char *s = str_trim(path);
+  if (!*s) return "";
+  Buf *bf = buf_new();
+  int isSlash = 0;
+  while (*s) {
+    char ch = *s++;
+    if (ch == '/') {
+      if (isSlash) continue;
+      isSlash = 1;
+      buf_cadd(bf, ch);
+      continue;
+    }
+    isSlash = 0;
+    buf_cadd(bf, ch);
+  }
+  s = buf_str(bf);
+  if (!s[1]) return s;
+  if (str_ends(s, "/")) s = str_left(s, -1);
+  //<char>
+  Arr *new = arr_new();
+  EACH(str_csplit(s, '/'), char, part) {
+    if (!strcmp(part, ".")) continue;
+    if (!strcmp(part, "..")) {
+      if (arr_size(new)) arr_pop(new);
+      else EXC_GENERIC(str_f("Bad path for cleaning '%s'", path));
+      continue;
+    }
+    arr_push(new, part);
+  }_EACH
+  s = arr_cjoin(new, '/');
+  if (!*s && *path == '/')
+    EXC_GENERIC(str_f("Bad path for cleaning '%s'", path));
+
+  return s;
 }
 
 Opt *path_canonical (char *s) {

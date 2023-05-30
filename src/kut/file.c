@@ -56,7 +56,7 @@ void file_cd (char *path) {
 }
 
 void file_mkdir (char *path) {
-  if (!*path) {
+  if (!*path || (*path == '/' && !path[1])) {
     return;
   }
 
@@ -65,7 +65,7 @@ void file_mkdir (char *path) {
     char *cwd = file_wd();
     p = str_f("%s/%s", cwd, path);
   } else {
-    p = str_new(path);
+    p = path;
   }
   p = path_parent(p);
   file_mkdir(p);
@@ -122,7 +122,11 @@ void file_rename (char *old_path, char *new_path) {
 }
 
 void file_link (char *path, char *link) {
-  if (symlink(path, link) == -1)
+  char *p = opt_get(path_canonical(path));
+  if (!p)
+    EXC_IO(str_f("'%s' can not be 'canonicalized'", path));
+
+  if (symlink(p, link) == -1)
     EXC_IO(str_f(
       "Fail linking '%s' to '%s: %s", link, path, strerror(errno)
     ));

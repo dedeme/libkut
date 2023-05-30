@@ -8,12 +8,14 @@
 #include <sys/types.h>
 #include <unistd.h>
 #include <pwd.h>
+#include <errno.h>
 #include "kut/sys.h"
 #include "kut/DEFS.h"
 #include "kut/str.h"
 #include "kut/buf.h"
 #include "kut/thread.h"
 #include "kut/file.h"
+#include "kut/time.h"
 
 static int initialized = FALSE;
 
@@ -23,6 +25,7 @@ void sys_init(void) {
 
   initialized = TRUE;
   setlocale(LC_ALL, "C");
+
   srand(time(0));
   exc_init();
 }
@@ -41,12 +44,20 @@ Map *sys_environ(void) {
 }
 
 void sys_sleep (int millis) {
+  Time end = time_now() + millis;
   struct timespec t;
   struct timespec rem;
 
-  t.tv_sec = millis / 1000;
-  t.tv_nsec = (millis % 1000) * 1000000;
-  nanosleep(&t, &rem);
+  for (;;) {
+    t.tv_sec = millis / 1000;
+    t.tv_nsec = (millis % 1000) * 1000000;
+    if (nanosleep(&t, &rem)) {
+      millis = end - time_now();
+      if (millis <= 0) break;
+    } else {
+      break;
+    }
+  }
 }
 
 void sys_set_locale (char *language) {
@@ -70,25 +81,15 @@ int sys_user_id(void) {
 }
 
 char *sys_user_name() {
-  char *name = "";
-    //--
-    void fn () {
-      struct passwd *pss = getpwuid(getuid());
-      if (pss) name = str_new(pss->pw_name);
-    }
-  thread_sync (fn);
-  return name;
+  char *name = opt_get(map_get(sys_environ(), "USER"));
+  if (name) return name;
+  return "";
 }
 
 char *sys_user_home(void) {
-  char *home = "";
-    //--
-    void fn () {
-      struct passwd *pss = getpwuid(getuid());
-      if (pss) home = str_new(pss->pw_dir);
-    }
-  thread_sync (fn);
-  return home;
+  char *home = opt_get(map_get(sys_environ(), "HOME"));
+  if (home) return home;
+  return "";
 }
 
 // <char>
@@ -109,11 +110,27 @@ Rs *sys_cmd(char *command) {
     line = NULL;
   }
   free(line);
-  fclose(fp);
+  pclose(fp);
 
-  char *err = file_read(ferr);
-  file_del(ferr);
+  char *err = "";
+  if (file_exists(ferr)) {
+    err = file_read(ferr);
+    file_del(ferr);
+  }
+
   char *out = str_new(buf_str(bf));
-
   return (*err) ? rs_fail(err) : rs_ok(out);
 }
+
+char *sys_read_line (void) {
+  char *s = malloc(150);
+  size_t n = 150;
+  if (getline(&s, &n, stdin) == -1) {
+    free(s); // correct
+    EXC_IO("Fail reading on console");
+  }
+  char *r = str_left(s, -1);
+  free(s);  // correct
+  return r;
+}
+

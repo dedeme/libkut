@@ -125,7 +125,8 @@
 ///   CATCH (e)
 ///     puts(exc_msg(e));
 ///   _TRY
-/// NOTE: CATCH block must return 'void'
+/// NOTE: To call 'return', 'break' or 'continue' in the TRY block, 'exc_remove()'
+///       must be called before.
 #define TRY { \
   jmp_buf *__TRY_buf = MALLOC(jmp_buf); \
   exc_add(__TRY_buf); \
@@ -140,12 +141,11 @@
 
 /// Throws an exception.
 ///   type <char *>: Exception type.
-///   format <char *>: Format string (see FMT)
-///   args... <variadic>: Arguments for 'format'.
+///   msg <char *>: Message.
 /// Example:
-///   THROW(exc_io_t, "Working directory not found: %s", strerror(errno));
-#define THROW(type, format, args...) \
-    exc_throw(type, str_f(format, ##args), __FILE__, (char *)__func__, __LINE__);
+///   THROW(exc_io_t, "Working directory not found");
+#define THROW(type, msg) \
+    exc_throw(type, msg, __FILE__, (char *)__func__, __LINE__)
 
 /// Throws a exception of type 'exc_generic_t'.
 ///   msg <char *>: Exception message.
@@ -165,7 +165,7 @@
     int __min = min; \
     int __max = max; \
     if (__v < __min || __v > __max) \
-      THROW(exc_range_t, exc_range(__min, __max, __v)) \
+      THROW(exc_range_t, exc_range(__min, __max, __v)); \
   }
 
 /// Throw a expection if type 'exc_illegal_argument_t'.
@@ -195,21 +195,21 @@
     char *__actual = actual; \
     char *__expected = expected; \
     if (strcmp(__actual, __expected)) \
-    EXC_ILLEGAL_ARGUMENT("Test failed", __expected, __actual) \
+    EXC_ILLEGAL_ARGUMENT("Test failed", __expected, __actual); \
   }
 
 #define TESTI(actual, expected) { \
     char *__sactual = str_f("%d", actual); \
     char *__sexpected = str_f("%d", expected); \
     if (strcmp(__sactual, __sexpected)) \
-    EXC_ILLEGAL_ARGUMENT("Test failed", __sexpected, __sactual) \
+    EXC_ILLEGAL_ARGUMENT("Test failed", __sexpected, __sactual); \
   }
 
 #define TESTF(actual, expected) { \
     char *__sactual = str_f("%.10f", (double)actual); \
     char *__sexpected = str_f("%.10f", (double)expected); \
     if (strcmp(__sactual, __sexpected)) \
-    EXC_ILLEGAL_ARGUMENT("Test failed", __sexpected, __sactual) \
+    EXC_ILLEGAL_ARGUMENT("Test failed", __sexpected, __sactual); \
   }
 
 /// Type of a map operation.

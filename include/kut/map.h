@@ -18,6 +18,20 @@ Map *map_new(void);
 /// Returns the number of elements.
 int map_size(Map *this);
 
+/// Puts 'value' with key 'key'. If key already exists an EXC_ILLEGAL_ARGUMENT
+/// is thrown.
+///   this : The map.
+///   key  : Entry key.
+///   value: New value
+void map_add(Map *this, char *key, void *value);
+
+/// Puts 'value' with key 'key'. If key does not exists an EXC_ILLEGAL_ARGUMENT
+/// is thrown.
+///   this : The map.
+///   key  : Entry key.
+///   value: New value
+void map_set(Map *this, char *key, void *value);
+
 /// Puts 'value' with key 'key'. If key already exists its value
 /// is changed.
 ///   this : The map.

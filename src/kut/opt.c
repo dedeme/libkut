@@ -27,7 +27,7 @@ void *opt_get (Opt *this) {
 
 void *opt_eget (Opt *this) {
   if (!this->value)
-    EXC_ILLEGAL_STATE("Option is null")
+    EXC_ILLEGAL_STATE("Option is null");
 
   return this->value;
 }

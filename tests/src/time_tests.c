@@ -5,7 +5,7 @@
 #include "kut/DEFS.h"
 #include "kut/time.h"
 #include "kut/sys.h"
-
+#include <locale.h>
 void time_tests(void) {
   puts(">>> time:");
 
@@ -21,7 +21,7 @@ void time_tests(void) {
   s = time_to_str(d);
   TEST(s, "19881231");
   s = time_to_us(d);
-  TEST(s, "12/31/1988");
+  TEST(s, "12-31-1988");
   d = time_from_iso("01/02/2020");
   s = time_to_str(d);
   TEST(s, "20200201");

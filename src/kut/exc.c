@@ -99,8 +99,8 @@ void exc_thread_init (void) {
     Exc *exc = exc_new(self, bf);
 
     int i = -1;
-    EACH(pool, Exc, exc)
-      if (pthread_equal(exc->thread, self)) {
+    EACH(pool, Exc, exc2)
+      if (pthread_equal(exc2->thread, self)) {
         i = _i;
         break;
       }

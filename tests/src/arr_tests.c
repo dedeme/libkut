@@ -321,6 +321,15 @@ void arr_tests(void) {
   assert(test("-a-b-c-", arr_map2(mk(),(FMAP)map1, (FMAP)map)));
 
   //(
+    char *freduce (char *r, char *e) { return str_f("%s%s", r, e); }
+  //)
+  // <char>
+  Arr *a = arr_new_from("a", "b", "c", NULL);
+  assert(
+    !strcmp(arr_reduce(a, "-", (void *(*)(void *, void *))freduce), "-abc")
+  );
+
+  //(
     void *zip(void *e1, void *e2) {
       char *s = ATOMIC(80);
       sprintf(s, "(%s-%s)", (char*)e1, (char *)e2);
