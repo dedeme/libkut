@@ -146,7 +146,7 @@ void arr_filter_in (Arr *this, int (*pred)(void *e));
 
 /// Returns a new Arr with the 'n' first elements of 'this'.
 /// If 'this' has less elements than 'n', returs a copy of this.
-/// If 'n <= 0) returns an empty array.
+/// If 'n <= 0' returns an empty array.
 Arr *arr_take (Arr *this, int n);
 
 /// Returns a new Arr with the first elements which return 'TRUE' with 'pred'.
