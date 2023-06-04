@@ -121,9 +121,6 @@ int arr_eq(Arr *a1, Arr *a2, int (*feq)(void *e1, void *e2));
 /// 'pred' can be cast to FPRED.
 int arr_index (Arr *this, int (*pred)(void *e));
 
-/// Equals to (arr_index(a, fn) != -1)
-int arr_contains (Arr *this, int (*pred)(void *e));
-
 /// Returns the index of the last elements which returns 'TRUE'
 /// with 'pred', or -1 if such element does not exist.
 /// 'pred' can be cast to FPRED.

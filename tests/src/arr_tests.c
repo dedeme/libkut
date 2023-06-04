@@ -210,7 +210,7 @@ void arr_tests(void) {
 
   int pred (void *s) { return *((char *)s) < 'd'; }
   assert(arr_index(arr_new(), pred) == -1);
-  assert(!arr_contains(arr_new(), pred));
+  assert(!arr_any(arr_new(), pred));
   assert(arr_last_index(arr_new(), pred) == -1);
   assert(!opt_get(arr_find(arr_new(), pred)));
   assert(!opt_get(arr_find_last(arr_new(), pred)));
@@ -219,9 +219,9 @@ void arr_tests(void) {
   assert(arr_index(arr_new_from("a", "b", NULL), pred) == 0);
   assert(arr_index(arr_new_from("d", "e", "b", NULL), pred) == 2);
   assert(arr_index(arr_new_from("d", "e", NULL), pred) == -1);
-  assert(arr_contains(arr_new_from("a", "b", NULL), pred));
-  assert(arr_contains(arr_new_from("d", "e", "b", NULL), pred));
-  assert(!arr_contains(arr_new_from("d", "e", NULL), pred));
+  assert(arr_any(arr_new_from("a", "b", NULL), pred));
+  assert(arr_any(arr_new_from("d", "e", "b", NULL), pred));
+  assert(!arr_any(arr_new_from("d", "e", NULL), pred));
   assert(arr_last_index(arr_new_from("a", "b", NULL), pred) == 1);
   assert(arr_last_index(arr_new_from("a", "b", "a", NULL), pred) == 2);
   assert(arr_last_index(arr_new_from("d", "e", "b", NULL), pred) == 2);

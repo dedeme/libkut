@@ -358,13 +358,6 @@ int arr_index (Arr *this, int (*pred)(void *e)) {
   return -1;
 }
 
-int arr_contains (Arr *this, int (*pred)(void *e)) {
-  void **es = this->es;
-  void **p = es;
-  while (p < this->end) if (pred(*p++)) return TRUE;
-  return FALSE;
-}
-
 Opt *arr_find(Arr *this, int (*pred)(void *e)) {
   void **p = this->es;
   while (p < this->end) {

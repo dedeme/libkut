@@ -178,19 +178,22 @@
   THROW(exc_illegal_argument_t, exc_illegal_argument(msg, expected, actual))
 
 /// Throws a 'exc_illegal_state_t'.
-///   msg <char *>     : Exception message.
+///   msg <char *>: Exception message.
 /// Example:
 ///   EXC_ILLEGAL_STATE("Fail");
 #define EXC_ILLEGAL_STATE(msg) \
   THROW(exc_illegal_state_t, msg)
 
 /// Throws a 'exc_io_t'.
-///   msg <char *>     : Exception message.
+///   msg <char *>: Exception message.
 /// Example:
 ///   EXC_IO("Fail");
 #define EXC_IO(msg) \
   THROW(exc_io_t, msg)
 
+/// Testi if actual is equals to expected.
+///   actual <char *>   : Actual value.
+///   expected <char *>: Expected value.
 #define TEST(actual, expected) { \
     char *__actual = actual; \
     char *__expected = expected; \
@@ -198,6 +201,9 @@
     EXC_ILLEGAL_ARGUMENT("Test failed", __expected, __actual); \
   }
 
+/// Testi if actual is equals to expected.
+///   actual <int>   : Actual value.
+///   expected <int>: Expected value.
 #define TESTI(actual, expected) { \
     char *__sactual = str_f("%d", actual); \
     char *__sexpected = str_f("%d", expected); \
@@ -205,6 +211,9 @@
     EXC_ILLEGAL_ARGUMENT("Test failed", __sexpected, __sactual); \
   }
 
+/// Testi if actual is equals to expected.
+///   actual <double>   : Actual value.
+///   expected <double>: Expected value.
 #define TESTF(actual, expected) { \
     char *__sactual = str_f("%.10f", (double)actual); \
     char *__sexpected = str_f("%.10f", (double)expected); \
@@ -218,7 +227,6 @@
 ///     arr_new_from("a", "b", NULL),
 ///     (FMAP)str_to_upper
 ///   ), ""), "AB"));
-
 typedef void *(*FMAP)(void *);
 
 /// Type of a comparison operation.
