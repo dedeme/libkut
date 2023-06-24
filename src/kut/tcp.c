@@ -78,10 +78,11 @@ Rs *tcp_read (TcpConn *conn, int len, int seconds) {
   if (rsel == 0)
     return rs_fail("Time out");
 
-  unsigned char bs[len + 1];
+  int len1 = len + 1;
+  unsigned char bs[len1];
   int rlen;
   for (;;) {
-    rlen = (int)recv(conn->id, bs, len + 1, 0);
+    rlen = (int)read(conn->id, bs, len1);
     if (rlen < 0 && errno == EINTR) continue;
     break;
   }
@@ -94,8 +95,47 @@ Rs *tcp_read (TcpConn *conn, int len, int seconds) {
   if (rlen > len)
     return rs_fail("Connection overflow");
 
+  int tt = rlen;
+  if (!memcmp("POST ", bs, 5)) {
+    unsigned char *pbs = bs;
+    int ix = -1;
+    int ibody = -1;
+    for (int i = 0; i < 5000; ++i, ++pbs) {
+      if (!memcmp("Content-Length: ", pbs, 16)) {
+        ix = i + 16;
+      } else if (!memcmp("\r\n\r\n", pbs, 4)) {
+        ibody = i + 4;
+      }
+    }
+    if (ix != -1 && ibody != -1) {
+      char sn[9];
+      memcpy(sn, bs + ix, 8);
+      sn[8] = 0;
+      int post_len = atoi(sn) + ibody;
+
+      while (tt < post_len) {
+        for (;;) {
+          rlen = (int)read(conn->id, bs + tt, len1 - tt);
+          if (rlen < 0 && errno == EINTR) continue;
+          break;
+        }
+        if (rlen < 0) {
+          close(conn->id);
+          return rs_fail(str_f(
+            "Fail reading on connection (recv): %s", strerror(errno)
+          ));
+        }
+        if (rlen > len)
+          return rs_fail("Connection overflow");
+        if (rlen == 0)
+          return rs_fail("Incomplete POST request");
+        tt += rlen;
+      }
+    }
+  }
+
   Bytes *r = bytes_new();
-  bytes_add_bytes(r, bs, rlen);
+  bytes_add_bytes(r, bs, tt);
   return rs_ok(r);
 }
 

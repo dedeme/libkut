@@ -27,7 +27,7 @@ static File *lckFile_new(struct flock *lock, FILE *f) {
 }
 
 char *file_tmp (char *dir, char *path) {
-  if (!*dir) dir = ".";
+  if (!*dir) dir = "/tmp";
   char *fpath = NULL;
   for (;;) {
     fpath = str_f("%s/%s%s", dir, path, str_replace(cryp_genk(8), "/", "-"));

@@ -94,12 +94,18 @@ char *sys_user_home(void) {
 
 // <char>
 Rs *sys_cmd(char *command) {
+  Tp *tp = sys_cmd2(command);
+  return (*(char *)tp_e2(tp)) ? rs_fail(tp_e2(tp)) : rs_ok(tp_e1(tp));
+}
+
+// <<char>, <char>
+Tp *sys_cmd2(char *command) {
   char *ferr = file_tmp("/tmp", "dmC");
   char *cmd = str_f("%s 2>%s", command, ferr);
   FILE *fp = popen(cmd, "r");
 
   if (!fp)
-    return rs_fail(str_f("NOEXEC: '%s'", command));
+    return tp_new(str_f("NOEXEC: '%s'", command), "");
 
   Buf *bf = buf_new();
   char *line = NULL;
@@ -118,8 +124,7 @@ Rs *sys_cmd(char *command) {
     file_del(ferr);
   }
 
-  char *out = str_new(buf_str(bf));
-  return (*err) ? rs_fail(err) : rs_ok(out);
+  return tp_new(str_new(buf_str(bf)), err);
 }
 
 char *sys_read_line (void) {

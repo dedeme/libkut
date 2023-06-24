@@ -7,6 +7,7 @@
   #define LKUT_SYS_H
 
 #include "rs.h"
+#include "tp.h"
 #include "map.h"
 
 /// Initializes the system.
@@ -45,10 +46,16 @@ char *sys_user_name();
 /// If the current user can not be found, it returns "".
 char *sys_user_home(void);
 
-/// Executes 'command' and returns a Rs<char> with values: [stderr - stdout].
-/// If the command can not be exectued returns the stderr message
-/// "NOEXEC: <cmd>", where 'cmd' is 'command'.
+/// Executes 'command' and returns a Rs<char>.
+/// If stderr != "", returns rs_fail(stderr). Otherwise returns rs.ok(stdout).
+/// If the command can not be exectued returns rs.fail("NOEXEC: <cmd>"), where
+/// 'cmd' is 'command'.
 Rs *sys_cmd(char *command);
+
+/// Executes 'command' and returns a Tp<char, char> with values: [stdout - stderr].
+/// If the command can not be exectued returns ("", "NOEXEC: <cmd>"), where
+/// 'cmd' is 'command'.
+Tp *sys_cmd2(char *command);
 
 /// Reads a line from console.
 /// The trailing '\n' is not read.

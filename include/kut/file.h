@@ -16,7 +16,7 @@ typedef struct file_File File;
 
 /// Returns a string with a not duplicate path whose template:
 ///   'dir' + '/' + 'path' + "xxxxxxxx"
-/// If 'dir' is "", the current working directory is used.
+/// If 'dir' is "", "/tmp" directory is used.
 /// NOTE: Before call this function must be called 'sys.init()'
 char *file_tmp (char *dir, char *path);
 
