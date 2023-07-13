@@ -255,10 +255,19 @@ void arr_sort (Arr *this, int (*greater)(void *, void *)) {
     if (size < 2) {
       return;
     }
+    if (size == 2) {
+      if (greater(a[0], a[1])) { void *tmp = a[0]; a[0] = a[1]; a[1] = tmp; }
+      return;
+    }
+    if (size == 3) {
+      if (greater(a[0], a[1])) { void *tmp = a[0]; a[0] = a[1]; a[1] = tmp; }
+      if (greater(a[0], a[2])) { void *tmp = a[0]; a[0] = a[2]; a[2] = tmp; }
+      if (greater(a[1], a[2])) { void *tmp = a[1]; a[1] = a[2]; a[2] = tmp; }
+    }
     int mid1 = size / 2;
     int mid2 = size - mid1;
-    void **a1 = GC_MALLOC(mid1 * sizeof(void *));
-    void **a2 = GC_MALLOC(mid2 * sizeof(void *));
+    void *a1[mid1];
+    void *a2[mid2];
     void **pa = a;
     void **pa1 = a1;
     void **pa2 = a2;
