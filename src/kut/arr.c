@@ -264,7 +264,7 @@ void arr_sort (Arr *this, int (*greater)(void *, void *)) {
       if (greater(a[0], a[2])) { void *tmp = a[0]; a[0] = a[2]; a[2] = tmp; }
       if (greater(a[1], a[2])) { void *tmp = a[1]; a[1] = a[2]; a[2] = tmp; }
     }
-    int mid1 = size / 2;
+    int mid1 = size >> 1;
     int mid2 = size - mid1;
     void *a1[mid1];
     void *a2[mid2];
@@ -277,39 +277,25 @@ void arr_sort (Arr *this, int (*greater)(void *, void *)) {
     sort(a2, mid2);
 
     pa = a;
-    int ia1 = 0;
     pa1 = a1;
-    int ia2 = 0;
+    void **pa1_end = a1 + mid1;
     pa2 = a2;
+    void **pa2_end = a2 + mid2;
 
     for(;;) {
-      if (ia1 == mid1) {
-        for(;;) {
-          if (ia2++ == mid2) {
-            break;
-          }
-          *pa++ = *pa2++;
-        }
+      if (pa1 == pa1_end) {
+        while (pa2 < pa2_end) *pa++ = *pa2++;
         break;
       }
-      if (ia2 == mid2) {
-        for (;;) {
-          if (ia1++ == mid1) {
-            break;
-          }
-          *pa++ = *pa1++;
-        }
+      if (pa2 == pa2_end) {
+        while (pa1 < pa1_end) *pa++ = *pa1++;
         break;
       }
-      if (greater(*pa1, *pa2)) {
-        *pa++ = *pa2++;
-        ++ia2;
-      } else {
-        *pa++ = *pa1++;
-        ++ia1;
-      }
+      if (greater(*pa1, *pa2)) *pa++ = *pa2++;
+      else *pa++ = *pa1++;
     }
   }
+
   sort(this->es, this->end - this->es);
 }
 
