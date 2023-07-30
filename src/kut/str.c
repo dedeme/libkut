@@ -40,8 +40,9 @@ int str_eq (char *str1, char *str2) {
 }
 
 int str_starts (char *str, char  *substr) {
-  int sublen = strlen(substr);
-  return strlen(str) >= sublen && !memcmp(str, substr, sublen);
+  while (*substr)
+    if (*str++ != *substr++) return 0;
+  return 1;
 }
 
 int str_ends (char *str, char  *substr) {
