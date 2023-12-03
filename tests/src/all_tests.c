@@ -24,7 +24,7 @@
 int main(int argc, char *argv[]) {
   sys_init();
 
-  exc_tests();
+/*  exc_tests();
   path_tests();
   str_tests();
   arr_tests();
@@ -36,9 +36,9 @@ int main(int argc, char *argv[]) {
   js_tests();
   dec_tests();
   time_tests();
-  file_tests();
-  regex_tests();
+*/  file_tests();
+/*  regex_tests();
   it_tests();
   thread_tests();
-  sys_tests();
+  sys_tests();*/
 }

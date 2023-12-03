@@ -39,6 +39,7 @@ TcpServer *tcp_server (int port, int conns) {
   listen(id, conns);
 
   this->id = id;
+
   return this;
 }
 
@@ -143,10 +144,10 @@ char *tcp_write (TcpConn *conn, Bytes *bs) {
   int rs;
   for (;;) {
     rs = send(conn->id, bytes_bs(bs), bytes_len(bs), 0);
-    if (rs == 1 && errno == EINTR) continue;
+    if (rs == -1 && errno == EINTR) continue;
     break;
   }
-  if (rs == 1) {
+  if (rs == -1) {
     close(conn->id);
     return str_f("Fail sending on connection: %s", strerror(errno));
   }

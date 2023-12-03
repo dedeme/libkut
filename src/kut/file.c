@@ -31,7 +31,7 @@ char *file_tmp (char *dir, char *path) {
   char *fpath = NULL;
   for (;;) {
     fpath = str_f("%s/%s%s", dir, path, str_replace(cryp_genk(8), "/", "-"));
-    if (!file_exists(path)) break;
+    if (!file_exists(fpath)) break;
   }
   return fpath;
 }
