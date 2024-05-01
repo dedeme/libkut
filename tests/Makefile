@@ -1,6 +1,6 @@
 LIB=kut
 
-CFLAGS = -Wall -rdynamic
+CFLAGS = -Wall -rdynamic -z execstack
 C_TESTS = $(wildcard src/*.c)
 H_TESTS = $(wildcard include/*.h)
 TESTS = $(C_TESTS) $(H_TESTS)

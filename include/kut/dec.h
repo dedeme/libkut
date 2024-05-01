@@ -3,8 +3,10 @@
 
 /// Utilitis to manage numbers.
 
+#include <stdint.h>
+
 /// Returns a standard string from 'n'.
-char *dec_itos (long n);
+char *dec_itos (int64_t n);
 
 /// Returns a standard string from 'n', with 'scale' decimal digits.
 /// 'scale' is forzed to a value between '0' and '9' (both inclusive)
@@ -20,7 +22,7 @@ int dec_stoi (char *s);
 /// Returns an 'long' from its standard string.
 /// 's' is 'trimmized' and then it can no be "".
 /// Throws EXC_ILLEGAL_ARGUMENT if 's' is not a valid number.
-long dec_stol (char *s);
+int64_t dec_stol (char *s);
 
 /// Returns an 'float' from its standard string.
 /// 's' is 'trimmized' and then it can no be "".

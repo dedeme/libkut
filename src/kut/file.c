@@ -30,7 +30,10 @@ char *file_tmp (char *dir, char *path) {
   if (!*dir) dir = "/tmp";
   char *fpath = NULL;
   for (;;) {
-    fpath = str_f("%s/%s%s", dir, path, str_replace(cryp_genk(8), "/", "-"));
+    char *k = cryp_genk(16);
+    char *pid = str_f("%d", (int)getpid());
+    char *v = str_left(cryp_encode(k, pid), 8);
+    fpath = str_f("%s/%s%s", dir, path, str_replace(v, "/", "-"));
     if (!file_exists(fpath)) break;
   }
   return fpath;

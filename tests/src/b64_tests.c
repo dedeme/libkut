@@ -9,7 +9,7 @@ void b64_tests(void) {
   puts(">>> b64:");
 
   char *b64 = b64_encode("Cañónç䍆");
-  assert(!strcmp(b64, "Q2HDscOzbsOn5I2G"));
+  TEST(b64, "Q2HDscOzbsOn5I2G");
 
   b64 = b64_encode("");
   assert(!strcmp(b64, ""));

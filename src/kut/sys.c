@@ -100,31 +100,35 @@ Rs *sys_cmd(char *command) {
 
 // <<char>, <char>
 Tp *sys_cmd2(char *command) {
+  Tp *r;
   char *ferr = file_tmp("/tmp", "dmC");
-  char *cmd = str_f("%s 2>%s", command, ferr);
-  FILE *fp = popen(cmd, "r");
+  TRY {
+    char *cmd = str_f("%s 2>%s", command, ferr);
+    FILE *fp = popen(cmd, "r");
 
-  if (!fp)
-    return tp_new(str_f("NOEXEC: '%s'", command), "");
+    if (!fp)
+      return tp_new(str_f("NOEXEC: '%s'", command), "");
 
-  Buf *bf = buf_new();
-  char *line = NULL;
-  size_t len = 0;
-  while (getline(&line, &len, fp) != -1) {
-    buf_add(bf, line);
+    Buf *bf = buf_new();
+    char *line = NULL;
+    size_t len = 0;
+    while (getline(&line, &len, fp) != -1) {
+      buf_add(bf, line);
+      free(line);
+      line = NULL;
+    }
     free(line);
-    line = NULL;
-  }
-  free(line);
-  pclose(fp);
+    pclose(fp);
 
-  char *err = "";
-  if (file_exists(ferr)) {
-    err = file_read(ferr);
-    file_del(ferr);
-  }
+    char *err = file_exists(ferr) ? file_read(ferr) : "";
 
-  return tp_new(str_new(buf_str(bf)), err);
+    r = tp_new(str_new(buf_str(bf)), err);
+  } CATCH (e) {
+    r = tp_new("", e);
+  }_TRY
+
+  file_del(ferr);
+  return r;
 }
 
 char *sys_read_line (void) {

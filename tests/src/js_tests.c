@@ -76,6 +76,8 @@ void js_tests(void) {
   s = js_wf(-21.04, 6);
   assert(js_rd(s) == -21.04);
 
+//  puts(js_wl((int64_t) 1708936633085));
+
   str = js_rs("  \"\" ");
   assert(str_eq("", str));
   str = js_rs("  \"a\\u0030\" ");

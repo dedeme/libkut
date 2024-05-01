@@ -239,6 +239,8 @@ void str_tests(void) {
   r = arr_cjoin(a, ';');
   TEST(r, ";");
   a = str_csplit(tx1, ';');
+  TESTI(arr_size(a) , 1);
+  TEST(arr_get(a, 0), tx1);
   r = arr_cjoin(a, ';');
   TEST(r, tx1);
   a = str_csplit(tx2, ';');
@@ -269,6 +271,8 @@ void str_tests(void) {
   r = arr_join(a, ";--");
   TEST(r, tx01b);
   a = str_split(tx1, ";--");
+  TESTI(arr_size(a) , 1);
+  TEST(arr_get(a, 0), tx1);
   r = arr_join(a, ";--");
   TEST(r, tx1);
   a = str_split(tx2b, ";--");

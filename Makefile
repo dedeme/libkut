@@ -1,6 +1,6 @@
 LIB=kut
 
-CFLAGS = -Wall -rdynamic
+CFLAGS = -Wall -rdynamic -z execstack
 
 OBJECTS = $(subst src/$(LIB),obj,$(patsubst %.c,%.o,$(wildcard src/$(LIB)/*.c)))
 

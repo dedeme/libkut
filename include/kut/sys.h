@@ -25,11 +25,11 @@ void sys_set_locale (char *language);
 char *sys_get_locale (void);
 
 /// Generates a new double between 0.0 (inclusive) and 1.0 (exclusive).
-/// For working, 'sys_init()' must be calle before.
+/// For working, 'sys_init()' must be called before.
 double sys_rnd_d (void);
 
 /// Generates a new int between 0 (inclusive) and 'top' (exclusive).
-/// For working, 'sys_init()' must be calle before.
+/// For working, 'sys_init()' must be called before.
 int sys_rnd_i (int top);
 
 /// Stops the current thread.

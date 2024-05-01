@@ -6,7 +6,7 @@
 #include <locale.h>
 #include "kut/DEFS.h"
 
-char *dec_itos (long n) {
+char *dec_itos (int64_t n) {
   return str_f("%ld", n);
 }
 
@@ -37,7 +37,7 @@ long dec_stol (char *s) {
     EXC_ILLEGAL_ARGUMENT("Bad number", "An integer", "A empty string");
 
   char *tmp;
-  long r = strtol(s, &tmp, 0);
+  int64_t r = strtol(s, &tmp, 0);
   if (*tmp)
     EXC_ILLEGAL_ARGUMENT("Bad number", "A valid number", s);
 
@@ -90,6 +90,7 @@ int dec_digits (char *s) {
 }
 
 double dec_round (double n, int scale) {
+  n = n >= 0 ? n + 0.00000000001 : n - 0.00000000001;
   switch (scale) {
     case 0: return round(n);
     case 1: return round (n * 10.0) / 10.0;

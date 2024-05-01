@@ -111,6 +111,7 @@ void dec_tests(void) {
   TESTF (dec_round(3425.235, 0), 3425);
   TESTF (dec_round(3425.5, 2), 3425.5);
   TESTF (dec_round(3425.235, 2), 3425.24);
+  TESTF (dec_round(-145.575, 2), -145.58);
 
   assert (dec_eq(-0, 0));
   assert (dec_eq(234, 234));

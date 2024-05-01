@@ -12,7 +12,7 @@ void path_tests(void) {
   TEST(path_cat("a", "b", NULL), "a/b");
   TEST(path_cat("a", "b", "c", NULL), "a/b/c");
   TEST(path_cat("a", "", NULL), "a/");
-  TEST(path_cat("", "b", "", NULL), "b/");
+  TEST(path_cat("", "b", "", NULL), "./b/");
 
   TEST(path_base(""), "");
   TEST(path_base("/"), "");

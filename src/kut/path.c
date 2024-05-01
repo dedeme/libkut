@@ -19,6 +19,7 @@ char *path_cat (char *name1, char *name2, ...) {
 
   if (!name1 || !name2)
     EXC_GENERIC("'path_cat' requieres at least 2 arguments.");
+  if (!*name1) name1 = ".";
 
   Buf *bf = buf_new();
   buf_add(bf, name1);
