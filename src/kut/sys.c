@@ -98,7 +98,7 @@ Rs *sys_cmd(char *command) {
   return (*(char *)tp_e2(tp)) ? rs_fail(tp_e2(tp)) : rs_ok(tp_e1(tp));
 }
 
-// <<char>, <char>
+// <<char>, <char>>
 Tp *sys_cmd2(char *command) {
   Tp *r;
   char *ferr = file_tmp("/tmp", "dmC");
@@ -106,8 +106,7 @@ Tp *sys_cmd2(char *command) {
     char *cmd = str_f("%s 2>%s", command, ferr);
     FILE *fp = popen(cmd, "r");
 
-    if (!fp)
-      return tp_new(str_f("NOEXEC: '%s'", command), "");
+    if (!fp) EXC_GENERIC(str_f("NOEXEC: '%s'", command));
 
     Buf *bf = buf_new();
     char *line = NULL;
@@ -121,10 +120,9 @@ Tp *sys_cmd2(char *command) {
     pclose(fp);
 
     char *err = file_exists(ferr) ? file_read(ferr) : "";
-
     r = tp_new(str_new(buf_str(bf)), err);
   } CATCH (e) {
-    r = tp_new("", e);
+    r = tp_new("", exc_msg(e));
   }_TRY
 
   file_del(ferr);

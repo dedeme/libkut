@@ -79,11 +79,10 @@ Rs *tcp_read (TcpConn *conn, int len, int seconds) {
   if (rsel == 0)
     return rs_fail("Time out");
 
-  int len1 = len + 1;
-  unsigned char bs[len1];
+  unsigned char bs[len];
   int rlen;
   for (;;) {
-    rlen = (int)read(conn->id, bs, len1);
+    rlen = (int)read(conn->id, bs, len);
     if (rlen < 0 && errno == EINTR) continue;
     break;
   }
@@ -93,8 +92,6 @@ Rs *tcp_read (TcpConn *conn, int len, int seconds) {
       "Fail reading on connection (recv): %s", strerror(errno)
     ));
   }
-  if (rlen > len)
-    return rs_fail("Connection overflow");
 
   int tt = rlen;
   if (!memcmp("POST ", bs, 5)) {
@@ -113,10 +110,14 @@ Rs *tcp_read (TcpConn *conn, int len, int seconds) {
       memcpy(sn, bs + ix, 8);
       sn[8] = 0;
       int post_len = atoi(sn) + ibody;
+      if (post_len > len)
+        return rs_fail(str_f(
+          "Post request length (%d) > maximum (%d", post_len, len
+        ));
 
       while (tt < post_len) {
         for (;;) {
-          rlen = (int)read(conn->id, bs + tt, len1 - tt);
+          rlen = (int)read(conn->id, bs + tt, len - tt);
           if (rlen < 0 && errno == EINTR) continue;
           break;
         }
@@ -126,8 +127,6 @@ Rs *tcp_read (TcpConn *conn, int len, int seconds) {
             "Fail reading on connection (recv): %s", strerror(errno)
           ));
         }
-        if (rlen > len)
-          return rs_fail("Connection overflow");
         if (rlen == 0)
           return rs_fail("Incomplete POST request");
         tt += rlen;

@@ -13,6 +13,7 @@
 #include "kut/cryp.h"
 #include "kut/path.h"
 #include "kut/buf.h"
+#include "kut/sys.h"
 
 struct file_File {
   struct flock *lock;

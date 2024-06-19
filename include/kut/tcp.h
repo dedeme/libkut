@@ -3,7 +3,7 @@
 
 /// TCP-IP utilities.
 ///
-/// Example:
+///   Example:
 ///
 ///|  #include "kut/thread.h"
 ///|  #include "main.h"
@@ -26,7 +26,7 @@
 ///|  }
 ///|
 ///|  static void runServer(void) {
-///|    TcpServer *sv = tcp_server(2525);
+///|    TcpServer *sv = tcp_server(2525, 5);
 ///|
 ///|    int end = FALSE;
 ///|    for(;;) {
@@ -131,7 +131,7 @@ Rs *tcp_accept (TcpServer *sv);
 /// Usually if bytes.size(rs.get()) is 0, it means that the other part has
 /// closed the connection.
 ///   conn   : Connection to read.
-///   len    : Maximun length of bytes to read.
+///   len    : Maximun length of bytes to read (can be read less).
 ///   seconds: Maximum waiting time.
 Rs *tcp_read (TcpConn *conn, int len, int seconds);
 
