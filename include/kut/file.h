@@ -50,6 +50,7 @@ void file_del (char *path);
 void file_rename (char *old_path, char *new_path);
 
 /// Makes a symbol link from 'link' to 'path'.
+/// 'path' should be relative to 'link' or absolute.
 /// Throws EX_IO.
 void file_link (char *path, char *link);
 
@@ -85,7 +86,7 @@ struct stat *file_info (char *path);
 /// Throws EX_IO.
 int file_size(char *path);
 
-/// Returns the last access in seconds.
+/// Returns the last access in milliseconds.
 /// Throws EX_IO.
 Time file_modified(char *path);
 

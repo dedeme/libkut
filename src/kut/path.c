@@ -57,9 +57,7 @@ char *path_parent (char *path) {
 char *path_extension (char *path) {
   path = path_base(path);
   int ix = str_last_cindex(path, '.');
-  if (ix == -1) {
-    ix = str_len(path);
-  }
+  if (ix == -1) return "";
   return str_right(path, ix);
 }
 

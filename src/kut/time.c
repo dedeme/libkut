@@ -5,7 +5,7 @@
 #include <sys/time.h>
 #include "kut/time.h"
 #include "kut/DEFS.h"
-#include "kut/dec.h"
+#include "kut/math.h"
 
 static time_t to_time (Time this) {
   return (time_t)(this / 1000);
@@ -72,7 +72,7 @@ static Time from_str(char *date) {
 }
 
 Time time_from_str (char *date) {
-  if (strlen(date) != 8 && !dec_digits(date))
+  if (strlen(date) != 8 && !math_digits(date))
     EXC_ILLEGAL_ARGUMENT("Bad date", "Date string", date);
   return from_str(date);
 }

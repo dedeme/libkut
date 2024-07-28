@@ -1,16 +1,16 @@
 // Copyright 24-Jan-2023 ºDeme
 // GNU General Public License - V3 <http://www.gnu.org/licenses/>
 
-#include "kut/dec.h"
+#include "kut/math.h"
 #include <math.h>
 #include <locale.h>
 #include "kut/DEFS.h"
 
-char *dec_itos (int64_t n) {
+char *math_itos (int64_t n) {
   return str_f("%ld", n);
 }
 
-char *dec_ftos (double n, int scale) {
+char *math_ftos (double n, int scale) {
   scale = scale < 0 ? 0 : scale > 9 ? 9 : scale;
   char *tpl = str_f("%%.%df", scale);
   char *loc = setlocale(LC_ALL, NULL);
@@ -27,11 +27,11 @@ char *dec_ftos (double n, int scale) {
   return ns;
 }
 
-int dec_stoi (char *s) {
-  return dec_stol(s);
+int math_stoi (char *s) {
+  return math_stol(s);
 }
 
-long dec_stol (char *s) {
+long math_stol (char *s) {
   s = str_trim(s);
   if (!*s)
     EXC_ILLEGAL_ARGUMENT("Bad number", "An integer", "A empty string");
@@ -44,11 +44,11 @@ long dec_stol (char *s) {
   return r;
 }
 
-float dec_stof (char *s) {
-  return dec_stod(s);
+float math_stof (char *s) {
+  return math_stod(s);
 }
 
-double dec_stod (char *s) {
+double math_stod (char *s) {
   s = str_trim(s);
   if (!*s)
     EXC_ILLEGAL_ARGUMENT("Bad number", "A double", "A empty string");
@@ -65,7 +65,7 @@ double dec_stod (char *s) {
   return r;
 }
 
-char *dec_to_locale (double n, int scale) {
+char *math_to_locale (double n, int scale) {
   scale = scale < 0 ? 0 : scale > 9 ? 9 : scale;
   char *tpl = str_f("%%'.%df", scale);
   char *ns = str_f(tpl, n);
@@ -73,15 +73,15 @@ char *dec_to_locale (double n, int scale) {
   return ns;
 }
 
-double dec_from_iso (char *s) {
-  return dec_stod(str_replace(str_replace(s, ".", ""), ",", "."));
+double math_from_iso (char *s) {
+  return math_stod(str_replace(str_replace(s, ".", ""), ",", "."));
 }
 
-double dec_from_en (char *s) {
-  return dec_stod(str_replace(s, ",", ""));
+double math_from_en (char *s) {
+  return math_stod(str_replace(s, ",", ""));
 }
 
-int dec_digits (char *s) {
+int math_digits (char *s) {
   if (!*s) return FALSE;
   char *ps = s;
   char ch;
@@ -89,7 +89,7 @@ int dec_digits (char *s) {
   return TRUE;
 }
 
-double dec_round (double n, int scale) {
+double math_round (double n, int scale) {
   n = n >= 0 ? n + 0.00000000001 : n - 0.00000000001;
   switch (scale) {
     case 0: return round(n);
@@ -107,23 +107,23 @@ double dec_round (double n, int scale) {
   }
 }
 
-int dec_eq (double n1, double n2) {
-  return dec_eq_gap(n1, n2, 0.0000001);
+int math_eq (double n1, double n2) {
+  return math_eq_gap(n1, n2, 0.0000001);
 }
 
-int dec_eq_gap (double n1, double n2, double gap) {
+int math_eq_gap (double n1, double n2, double gap) {
   gap = gap > 1 ? 1 : gap < 0.0000000001 ? 0.0000000001 : gap;
   return n1 < n2 + gap && n1 > n2 - gap;
 }
 
-double dec_abs (double n) {
+double math_abs (double n) {
   return n >= 0 ? n : -n;
 }
 
-double dec_pow (double base, double exp) {
+double math_pow (double base, double exp) {
   return pow(base, exp);
 }
 
-double dec_sqrt (double n) {
+double math_sqrt (double n) {
   return sqrt(n);
 }

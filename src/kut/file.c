@@ -126,11 +126,7 @@ void file_rename (char *old_path, char *new_path) {
 }
 
 void file_link (char *path, char *link) {
-  char *p = opt_get(path_canonical(path));
-  if (!p)
-    EXC_IO(str_f("'%s' can not be 'canonicalized'", path));
-
-  if (symlink(p, link) == -1)
+  if (symlink(path, link) == -1)
     EXC_IO(str_f(
       "Fail linking '%s' to '%s: %s", link, path, strerror(errno)
     ));

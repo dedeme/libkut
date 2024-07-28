@@ -7,7 +7,7 @@
 #include "kut/js.h"
 #include "kut/DEFS.h"
 #include "kut/buf.h"
-#include "kut/dec.h"
+#include "kut/math.h"
 
 static void json_unicode(Buf *bf, char *hexdigits) {
   char hexvalue (char ch) {
@@ -396,7 +396,7 @@ char *js_wl(long n) {
 }
 
 char *js_wf(double n, int scale) {
-  return dec_ftos(n, scale);
+  return math_ftos(n, scale);
 }
 
 char *js_ws(char *s) {

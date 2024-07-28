@@ -13,8 +13,9 @@
 #include "cryp_tests.h"
 #include "map_tests.h"
 #include "js_tests.h"
-#include "dec_tests.h"
+#include "math_tests.h"
 #include "time_tests.h"
+#include "path_tests.h"
 #include "file_tests.h"
 #include "regex_tests.h"
 #include "it_tests.h"
@@ -34,8 +35,9 @@ int main(int argc, char *argv[]) {
   cryp_tests();
   map_tests();
   js_tests();
-  dec_tests();
+  math_tests();
   time_tests();
+  path_tests();
   file_tests();
   regex_tests();
   it_tests();
