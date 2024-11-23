@@ -7,7 +7,7 @@
 #include "kut/sys.h"
 
 void math_tests(void) {
-  puts(">>> dec:");
+  puts(">>> math:");
 
   TEST(math_itos(-25), "-25");
   TEST(math_itos(0), "0");

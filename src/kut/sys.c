@@ -101,7 +101,7 @@ Rs *sys_cmd(char *command) {
 // <<char>, <char>>
 Tp *sys_cmd2(char *command) {
   Tp *r;
-  char *ferr = file_tmp("/tmp", "dmC");
+  char *ferr = file_tmp("/tmp", "C_libkut_sys_cmd2_");
   TRY {
     char *cmd = str_f("%s 2>%s", command, ferr);
     FILE *fp = popen(cmd, "r");
@@ -111,12 +111,16 @@ Tp *sys_cmd2(char *command) {
     Buf *bf = buf_new();
     char *line = NULL;
     size_t len = 0;
-    while (getline(&line, &len, fp) != -1) {
-      buf_add(bf, line);
-      free(line);
+    for (;;) {
       line = NULL;
+      len = 0;
+      if (getline(&line, &len, fp) == -1) break;
+      if (line) {
+        buf_add(bf, line);
+        free(line);
+      }
     }
-    free(line);
+    if (line) free(line);
     pclose(fp);
 
     char *err = file_exists(ferr) ? file_read(ferr) : "";

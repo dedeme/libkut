@@ -38,14 +38,18 @@ static void *thread_thread_run0 (void (*fn)(void)) {
 
 pthread_t *thread_start (void (*fn)(void)) {
   pthread_t *thr = MALLOC(pthread_t);
-  pthread_create(thr, NULL, (void *(*)(void *))thread_thread_run0, fn);
+  int err = pthread_create(thr, NULL, (void *(*)(void *))thread_thread_run0, fn);
+  if (err != 0)
+    EXC_GENERIC(str_f("Fail starting thread: %s", strerror(err)));
   return thr;
 }
 
 pthread_t *thread_start2 (void (*fn)(void *), void *value) {
   pthread_t *thr = MALLOC(pthread_t);
   struct thread_Thread *data = thread_thread_new(fn, value);
-  pthread_create(thr, NULL, (void *(*)(void *))thread_thread_run, data);
+  int err = pthread_create(thr, NULL, (void *(*)(void *))thread_thread_run, data);
+  if (err != 0)
+    EXC_GENERIC(str_f("Fail starting thread: %s", strerror(err)));
   return thr;
 }
 
@@ -55,7 +59,9 @@ void thread_run (void (*fn)(void)) {
   pthread_attr_setdetachstate(&attr, PTHREAD_CREATE_DETACHED);
 
   pthread_t *thr = MALLOC(pthread_t);
-  pthread_create(thr, &attr, (void *(*)(void *))thread_thread_run0, fn);
+  int err = pthread_create(thr, &attr, (void *(*)(void *))thread_thread_run0, fn);
+  if (err != 0)
+    EXC_GENERIC(str_f("Fail running thread: %s", strerror(err)));
 }
 
 void thread_run2 (void (*fn)(void *), void *value) {
@@ -65,7 +71,9 @@ void thread_run2 (void (*fn)(void *), void *value) {
 
   pthread_t *thr = MALLOC(pthread_t);
   struct thread_Thread *data = thread_thread_new(fn, value);
-  pthread_create(thr, &attr, (void *(*)(void *))thread_thread_run, data);
+  int err = pthread_create(thr, &attr, (void *(*)(void *))thread_thread_run, data);
+  if (err != 0)
+    EXC_GENERIC(str_f("Fail running thread: %s", strerror(err)));
 }
 
 void thread_join (pthread_t *thr) {

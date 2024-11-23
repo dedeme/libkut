@@ -210,7 +210,7 @@ void exc_throw (char *type, char *message, char *file, char *func, int line) {
 
 char *exc_range(int begin, int end, int index) {
   return str_f(
-    "Index out of range: %d out of [%d - %d]", index, begin, end
+    "Index out of range: %d < %d or %d > %d", index, begin, index, end
   );
 }
 

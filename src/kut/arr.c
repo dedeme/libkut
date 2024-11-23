@@ -20,11 +20,25 @@ Arr *arr_new (void) {
 }
 
 Arr *arr_new_bf (int buffer) {
+  if (buffer < 1) buffer = 1;
   Arr *this = MALLOC(Arr);
   void **es = GC_MALLOC(buffer * sizeof(void *));
   this->es = es;
   this->end = es;
   this->endbf = es + buffer;
+  return this;
+}
+
+Arr *arr_new_fill (void *e, int size) {
+  int bf_size = size < 15 ? 15 : size;
+  Arr *this = MALLOC(Arr);
+  void **es = GC_MALLOC(bf_size * sizeof(void *));
+  void **end = es + size;
+  this->es = es;
+  this->end = end;
+  this->endbf = es + bf_size;
+  void **p = es;
+  while (p < end) *p++ = e;
   return this;
 }
 
@@ -47,13 +61,13 @@ Arr *arr_new_from (void *e, ...) {
 }
 
 Arr *arr_new_c (int size, void **es) {
-  int bs_size= size * sizeof(void *);
+  int bf_size = size < 15 ? 15 : size;
 
   Arr *this = MALLOC(Arr);
-  this->es = GC_MALLOC(bs_size + bs_size);
+  this->es = GC_MALLOC(bf_size * sizeof(void *));
   this->end = this->es + size;
-  this->endbf = this->es + size + size;
-  memcpy(this->es, es, bs_size);
+  this->endbf = this->es + bf_size;
+  memcpy(this->es, es, size * sizeof(void *));
   return this;
 }
 
@@ -166,54 +180,53 @@ void arr_cat (Arr *this, Arr *other) {
   }
 }
 
+void arr_set_arr (Arr *this, int ix, Arr *other) {
+  arr_set_range(this, ix, other, 0, arr_size(other));
+}
+
+void arr_set_range (Arr *this, int ix, Arr *other, int begin, int end) {
+  if (end < begin)
+    EXC_ILLEGAL_ARGUMENT(
+      "end < begin", str_f("end >= %d", begin), str_f("end == %d", end)
+    );
+  int size = end - begin;
+  if (!size) return;
+  EXC_RANGE(begin, 0, arr_size(other) - size);
+  EXC_RANGE(ix, 0, arr_size(this) - size);
+  void **target = this->es + ix;
+  void **source = other->es + begin;
+  memcpy(target, source, sizeof(void *) * size);
+}
+
 void arr_insert_arr (Arr *this, int ix, Arr *other) {
+  return arr_insert_range(this, ix, other, 0, arr_size(other));
+}
+
+void arr_insert_range (Arr *this, int ix, Arr *other, int begin, int end) {
+  if (end < begin)
+    EXC_ILLEGAL_ARGUMENT(
+      "end < begin", str_f("end >= %d", begin), str_f("end == %d", end)
+    );
+  int other_len = end - begin;
+  if (!other_len) return;
+
   int this_len = this->end - this->es;
+  EXC_RANGE(begin, 0, arr_size(other) - other_len);
   EXC_RANGE(ix, 0, this_len);
 
-  int other_len = other->end - other->es;
-  if (other_len) {
-    int this_size = this->endbf - this->es;
-    int new_size = this_size;
-    if (this_len + other_len >= this_size){
-      new_size = this_size + other_len;
-
-      void **es = GC_MALLOC(new_size * sizeof(void *));
-      void **end = es;
-
-      void **p = this->es;
-      void **pend = p + ix;
-      while (p < pend) {
-        *end++ = *p++;
-      }
-      void **p2 = other->es;
-      void **p2end = other->end;
-      while (p2 < p2end) {
-        *end++ = *p2++;
-      }
-      pend = this->end;
-      while (p < pend) {
-        *end++ = *p++;
-      }
-
-      this->es = es;
-      this->end = end;
-      this->endbf = es + new_size;
-    } else {
-      void **s = this->end - 1;
-      void **t = s + other_len;
-      this->end = t + 1;
-      void **limit = this->es + ix;
-      while (s >= limit) {
-        *t-- = *s--;
-      }
-      s = other->es;
-      t = this->es + ix;
-      limit = other->end;
-      while (s < limit) {
-        *t++ = *s++;
-      }
-    }
-  }
+  int new_len = this_len + other_len;
+  int new_size = new_len + 15;
+  void **new_es = GC_MALLOC(new_size * sizeof(void *));
+  memcpy(new_es, this->es, sizeof(void *) * ix);
+  memcpy(new_es + ix, other->es + begin, sizeof(void *) * other_len);
+  memcpy(
+    new_es + (ix + other_len),
+    this->es + ix,
+    sizeof(void *) * ((this->end - this->es) - ix)
+  );
+  this->es = new_es;
+  this->end = new_es + new_len;
+  this->endbf = new_es + new_size;
 }
 
 void arr_remove_range (Arr *this, int begin, int end) {

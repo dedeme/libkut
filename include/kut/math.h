@@ -1,7 +1,7 @@
 // Copyright 24-Jan-2023 ºDeme
 // GNU General Public License - V3 <http://www.gnu.org/licenses/>
 
-/// Utilitis to manage numbers.
+/// Utilities to manage numbers.
 
 #ifndef LKUT_MATH_H
   #define LKUT_MATH_H
@@ -13,8 +13,9 @@ char *math_itos (int64_t n);
 
 /// Returns a standard string from 'n', with 'scale' decimal digits.
 /// 'scale' is forzed to a value between '0' and '9' (both inclusive)
+/// NOTE: The returned string has removed extra decimal zeroes.
 /// Example:
-///   math_ftos(12.5, 2); \\ -> "12.50"
+///   math_ftos(12.5, 2); \\ -> "12.5"
 char *math_ftos (double n, int scale);
 
 /// Returns an 'int' from its standard string.
@@ -38,7 +39,8 @@ float math_stof (char *s);
 double math_stod (char *s);
 
 /// Returns a locale string from 'n', with 'scale' decimal digits.
-/// 'scale' is forzed to a value between '0' and '9' (both inclusive)
+/// 'scale' is forzed to a value between '0' and '9' (both inclusive).
+/// NOTE: The returned string has a fix number of decimals.
 /// Example:
 ///   sys_set_locale("es_ES.utf8");
 ///   math_to_locale(3512.5, 2); \\ -> "3.512,50"

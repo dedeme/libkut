@@ -6,6 +6,10 @@
 #include "kut/buf.h"
 #include "kut/js.h"
 
+static int eq(double *e1, double *e2) {
+  return *e1 == *e2;
+}
+
 static int greater(double *e1, double *e2) {
   return *e1 > *e2;
 }
@@ -108,9 +112,19 @@ void arr_tests(void) {
   assert(*(double *)arr_get(ia, 2) == 2);
   assert(*(double *)arr_get(ia, 4) == 33);
 
+  Arr *ia_tmp2 = arr_copy(ia);
+  arr_set_arr(ia, 2, arr_new());
+  assert(arr_eq(ia, ia_tmp2, (FEQ)eq));
+  Arr *ia_tmp = arr_drop(ia, 2);
+  arr_set_arr(ia, 2, ia2);
+  assert(!arr_eq(ia, ia_tmp2, (FEQ)eq));
+  arr_set_arr(ia, 2, ia_tmp);
+  assert(arr_eq(ia, ia_tmp2, (FEQ)eq));
+
   for(int i = 0; i < arr_size(ia); ++i)
     arr_set(ia, i, double_new(101));
 
+  arr_insert_range(ia, 2, ia2, 0, 0);
   arr_insert_arr(ia, 2, ia2);
   assert(arr_size(ia) == 8);
   assert(*(double *)arr_get(ia, 0) == 101);

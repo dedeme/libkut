@@ -22,7 +22,6 @@ int regexOffset_begin (RegexOffset *off) {
   return off->begin;
 }
 
-/// Returns the offset end.
 int regexOffset_end (RegexOffset *off) {
   return off->end;
 }

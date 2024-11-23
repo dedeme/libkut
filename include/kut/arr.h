@@ -19,6 +19,10 @@ Arr *arr_new (void);
 /// Creates an empty array with a defined initial buffer.
 Arr *arr_new_bf (int buffer);
 
+/// Creates an array of size 'size' with every element equals to 'e'.
+/// 'e' is a 'NULL teminated' list of at leat one element.
+Arr *arr_new_fill (void *e, int size);
+
 /// Creates an array from its elements.
 /// 'e' is a 'NULL teminated' list of at leat one element.
 Arr *arr_new_from (void *e, ...);
@@ -75,9 +79,24 @@ void arr_remove (Arr *this, int ix);
 /// Adds in place elements (pointers) of 'other' to 'this'.
 void arr_cat (Arr *this, Arr *other);
 
+/// Sets elements from 'ix' (inclusive) with elements of 'other'.
+/// Throws EXC_RANGE if 'ix' or 'ix + arr_size(other)' is out of limits.
+void arr_set_arr (Arr *this, int ix, Arr *other);
+
+/// Sets elements from 'ix' (inclusive) with elements of 'other', from
+/// begin (inclusive) to end (exclusive).
+/// Throws EXC_RANGE if 'ix', 'begin', 'end' or 'ix + begin - end' are out of
+/// limits.
+void arr_set_range (Arr *this, int ix, Arr *other, int begin, int end);
+
 /// Inserts elements (pointers) of 'other' at 'ix'
 /// Throws EXC_RANGE if 'ix' is out of limits.
 void arr_insert_arr (Arr *this, int ix, Arr *other);
+
+/// Inserts elements (pointers) of 'other', from begin (inclusive) to end
+/// (exclusive), at 'ix'
+/// Throws EXC_RANGE if 'ix', 'begin' or 'end' are out of limits.
+void arr_insert_range (Arr *this, int ix, Arr *other, int begin, int end);
 
 /// Removes elements between [begin-end). Buffer size of 'this' does not change.
 /// Throws EXC_RANGE if begin or end are out of range.

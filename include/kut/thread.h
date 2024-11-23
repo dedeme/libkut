@@ -63,6 +63,8 @@ void thread_sync (void (*fn)(void));
 /// Example:
 ///   /**/void fn(char *tx) { puts(tx); }
 ///   thread_sync2((void(*)(void *))fn, "Hello");
+/// NOTE: if 'fn' call another function which also call 'thread_sync2' or
+///       'thread_sync', the program will be blocked.
 void thread_sync2 (void (*fn)(void *), void *value);
 
 #endif

@@ -130,7 +130,7 @@
 #define TRY { \
   jmp_buf *__TRY_buf = MALLOC(jmp_buf); \
   exc_add(__TRY_buf); \
-  if (!setjmp(*__TRY_buf)) { \
+  if (!setjmp(*__TRY_buf)) {
 
 /// See TRY.
 ///   e <literal>: Variable holding the exception.

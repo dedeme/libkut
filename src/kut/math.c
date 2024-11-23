@@ -13,12 +13,14 @@ char *math_itos (int64_t n) {
 char *math_ftos (double n, int scale) {
   scale = scale < 0 ? 0 : scale > 9 ? 9 : scale;
   char *tpl = str_f("%%.%df", scale);
-  char *loc = setlocale(LC_ALL, NULL);
-  setlocale(LC_ALL, "C");
   char *ns = str_f(tpl, n + (n >= 0 ? 0.000000000001 : -0.000000000001));
-  setlocale(LC_ALL, loc);
   if (scale > 0) {
-    char *p = ns + strlen(ns) - 1;
+    char *p = ns;
+    while (*p) {
+      if (*p == ',') *p++ = '.';
+      else ++p;
+    }
+    --p;
     while (*p == '0') --p;
     if (*p != '.') ++p;
     ns = str_left(ns, p - ns);
